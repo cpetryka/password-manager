@@ -3,4 +3,4 @@ project(password_manager)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(password_manager main.cpp)
+add_executable(password_manager main.cpp libs/libs.hpp model/sources/password.cpp model/password.hpp)
