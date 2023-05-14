@@ -12,5 +12,6 @@
 #include <algorithm>
 #include <optional>
 #include <memory>
+#include <cmath>
 
 #endif //PASSWORD_MANAGER_LIBS_HPP
