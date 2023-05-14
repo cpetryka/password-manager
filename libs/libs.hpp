@@ -11,5 +11,6 @@
 #include <fstream>
 #include <algorithm>
 #include <optional>
+#include <memory>
 
 #endif //PASSWORD_MANAGER_LIBS_HPP
