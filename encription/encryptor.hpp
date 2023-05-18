@@ -17,12 +17,6 @@ public:
         auto first_last_letters_difference = std::abs(seed.front() - seed.back());
 
         for(auto i = 0; i < expression.size(); ++i) {
-            /*if(i % 2 == 0) {
-                encrypted_expression += static_cast<char>(expression[i] + seed[i % seed.size()]);
-            } else {
-                encrypted_expression += static_cast<char>(expression[i] - seed[i % seed.size()]);
-            }*/
-
             if(i % 2 == 0) {
                 encrypted_expression += static_cast<char>(expression[i] + first_last_letters_difference);
             } else {
@@ -38,12 +32,6 @@ public:
         auto first_last_letters_difference = std::abs(seed.front() - seed.back());
 
         for(auto i = 0; i < expression.size(); ++i) {
-            /*if(i % 2 == 0) {
-                decrypted_expression += static_cast<char>(expression[i] - seed[i % seed.size()]);
-            } else {
-                decrypted_expression += static_cast<char>(expression[i] + seed[i % seed.size()]);
-            }*/
-
             if(i % 2 == 0) {
                 decrypted_expression += static_cast<char>(expression[i] - first_last_letters_difference);
             } else {
