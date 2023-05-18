@@ -13,5 +13,6 @@
 #include <optional>
 #include <memory>
 #include <cmath>
+#include <regex>
 
 #endif //PASSWORD_MANAGER_LIBS_HPP
