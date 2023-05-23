@@ -9,7 +9,7 @@
 #include "../model/password.hpp"
 
 class PasswordManager {
-    std::vector<Password> passwords;
+    std::vector<std::unique_ptr<Password>> passwords;
 public:
     PasswordManager();
 };
