@@ -4,11 +4,9 @@
 
 #include "../encryptor.hpp"
 
-Encryptor::Encryptor(const std::string &encryption_seed) : seed{encryption_seed} {}
-
-std::string Encryptor::encrypt(const std::string &expression) const  {
+std::string Encryptor::encrypt(const std::string &expression, const std::string& password)  {
     std::string encrypted_expression;
-    auto first_last_letters_difference = std::abs(seed.front() - seed.back());
+    auto first_last_letters_difference = std::abs(password.front() - password.back());
 
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
@@ -21,9 +19,9 @@ std::string Encryptor::encrypt(const std::string &expression) const  {
     return encrypted_expression;
 }
 
-std::string Encryptor::decrypt(const std::string &expression) const {
+std::string Encryptor::decrypt(const std::string &expression, const std::string& password) {
     std::string decrypted_expression;
-    auto first_last_letters_difference = std::abs(seed.front() - seed.back());
+    auto first_last_letters_difference = std::abs(password.front() - password.back());
 
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
@@ -34,4 +32,15 @@ std::string Encryptor::decrypt(const std::string &expression) const {
     }
 
     return decrypted_expression;
+}
+
+std::vector<std::string>
+Encryptor::decrypt_all(const std::vector<std::string> &expressions, const std::string &password) {
+    std::vector<std::string> decrypted_expressions;
+
+    std::ranges::for_each(expressions, [&decrypted_expressions, &password](const auto& expression) {
+        decrypted_expressions.push_back(decrypt(expression, password));
+    });
+
+    return decrypted_expressions;
 }

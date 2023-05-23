@@ -7,14 +7,13 @@
 
 #include "../libs/libs.hpp"
 
-class Encryptor {
-    std::string seed;
-public:
-    explicit Encryptor(const std::string& encryption_seed);
+struct Encryptor {
+    explicit Encryptor() = default;
 
-    std::string encrypt(const std::string& expression) const;
+    static std::string encrypt(const std::string& expression, const std::string& password);
 
-    std::string decrypt(const std::string& expression) const;
+    static std::string decrypt(const std::string& expression, const std::string& password);
+    static std::vector<std::string> decrypt_all(const std::vector<std::string>& expressions, const std::string& password);
 };
 
 #endif //PASSWORD_MANAGER_ENCRYPTOR_HPP

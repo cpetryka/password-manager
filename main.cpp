@@ -11,6 +11,7 @@ int main() {
     std::cout << "Welcome to Password Manager!" << std::endl;
     std::cout << "Decide whether you want to use one of the saved files with passwords or if you want to provide your own path." << std::endl;
 
+    // User's choice whether to use one of the saved files or to provide his own path
     auto path = fs::path {};
     auto choice {0};
     auto do_continue {true};
@@ -21,9 +22,11 @@ int main() {
         std::cout << "2 -> provide your own path" << std::endl;
         std::cout << "9 -> exit" << std::endl;
 
+        // Get user's choice
         std::cout << "Your choice: ";
         std::cin >> choice; std::cin.get();
 
+        // Perform action based on user's choice
         switch(choice) {
             case 1:
                 {
@@ -70,7 +73,51 @@ int main() {
         }
     }
 
+    // The result of the code above is the path to the file with passwords
+
     std::cout << "Chosen path: " << path << std::endl;
+
+    // Decryption of the file
+    auto file_content = FileReader::read(path.string());
+
+    do_continue = {true};
+    auto password = std::string {};
+    auto decrypted_content = std::vector<std::string> {};
+    auto attempts = 0;
+
+    while(do_continue) {
+        // If user exceeds 3 attempts, then exit the program
+        if(attempts++ == 3) {
+            std::cout << "You've exceeded the number of attempts!" << std::endl;
+            std::cout << "Exiting..." << std::endl;
+            return 0;
+        }
+
+        // Get password from user
+        std::cout << "Enter your password: ";
+        std::getline(std::cin, password);
+
+        // Decrypt file content
+        decrypted_content = Encryptor::decrypt_all(file_content, password);
+
+        // Validate decrypted content
+        auto validator = PasswordValidator{};
+
+        auto res = std::ranges::all_of(decrypted_content, [&validator](const auto& line) {
+            return validator.validate(line) || line.empty();
+        });
+
+        // Final actions
+        if(res) {
+            do_continue = {false};
+        }
+        else {
+            std::cout << "Wrong password!" << std::endl;
+            std::cout << "Try again!" << std::endl;
+        }
+    }
+
+    // The result of the code above is the decrypted content of the file
 
     return 0;
 }
