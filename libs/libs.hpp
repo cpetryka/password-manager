@@ -14,5 +14,8 @@
 #include <memory>
 #include <cmath>
 #include <regex>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 #endif //PASSWORD_MANAGER_LIBS_HPP
