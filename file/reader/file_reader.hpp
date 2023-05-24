@@ -8,7 +8,15 @@
 #include "../../libs/libs.hpp"
 #include "exception/file_reader_exception.hpp"
 
+/**
+ * @brief Class for reading data from file
+ */
 struct FileReader {
+    /**
+     * @brief Reads data from file
+     * @param std::string representing a path to a file
+     * @return std::vector<std::string> containing data from file
+     */
     static std::vector<std::string> read(const std::string& path) {
         std::ifstream in { path };
 

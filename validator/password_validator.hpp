@@ -7,6 +7,9 @@
 
 #include "validator.hpp"
 
+/**
+ * @brief Validator for strings representing password
+ */
 class PasswordValidator : public Validator {
     // The required format of the password record is:
     // Name can be any string
@@ -17,6 +20,11 @@ class PasswordValidator : public Validator {
     const std::regex PASSWORD_REGEX = std::regex(".+;.{8,30};[a-z]+;(-|www\\..+\\.(pl|com|org));(-|.+)");
 
 public:
+    /**
+     * @brief Checks if expression passed as an argument is a valid password
+     * @param std::string representing password
+     * @return true if expression is a valid password, false otherwise
+     */
     bool validate(const std::string &expression) const override {
         return std::regex_match(expression, PASSWORD_REGEX);
     }

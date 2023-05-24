@@ -7,9 +7,17 @@
 
 #include "../libs/libs.hpp"
 
+/**
+ * @brief Abstract class for validators
+ */
 struct Validator {
     Validator() = default;
 
+    /**
+     * @brief Checks if expression passed as an argument is valid
+     * @param std::string representing some expression
+     * @return true if expression is valid, false otherwise
+     */
     virtual bool validate(const std::string& expression) const = 0;
 
     virtual ~Validator() = default;

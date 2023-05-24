@@ -8,6 +8,10 @@
 #include "../libs/libs.hpp"
 #include "../model/password.hpp"
 
+/**
+ * @brief Class representing a password manager
+ * @details This class is used to manage passwords.
+ */
 class PasswordManager {
     std::vector<std::unique_ptr<Password>> passwords;
 public:

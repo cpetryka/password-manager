@@ -7,11 +7,19 @@
 
 #include "../libs/libs.hpp"
 
-// T - output type
+/**
+ * @brief Abstract class for parsers
+ * @tparam T which is output type
+ */
 template<typename T>
 struct Parser {
     Parser() = default;
 
+    /**
+     * @brief Parses expression passed as an argument
+     * @param std::string representing some expression
+     * @return T which is the output type
+     */
     virtual T parse(const std::string& expression) = 0;
 
     virtual ~Parser() = default;

@@ -7,6 +7,9 @@
 
 #include "../../../libs/libs.hpp"
 
+/**
+ * @brief Exception class for FileWriter
+ */
 class FileWriterException : public std::exception {
     std::string message;
 public:

@@ -8,7 +8,16 @@
 #include "../../libs/libs.hpp"
 #include "exception/file_writer_exception.hpp"
 
+/**
+ * @brief Class for writing data to file
+ */
 struct FileWriter {
+    /**
+     * @brief Saves data to file
+     * @tparam T representing the type of data to save
+     * @param std::string representing a path to a file
+     * @param std::vector<T> representing data to save
+     */
     template<typename T>
     static void save(const std::string& path, const std::vector<T>& data) {
         std::ofstream out { path };

@@ -8,8 +8,10 @@
 #include <ostream>
 #include "../libs/libs.hpp"
 
-// It's a class that represents a password and its data (description, category etc.)
-// This class is used in the PasswordManager class to store (and manage) passwords.
+/**
+ * @brief Class representing a password
+ * @details This class is used in the PasswordManager class to store (and manage) passwords.
+ */
 class Password {
     std::string description;
     std::string password;
