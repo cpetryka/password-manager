@@ -4,6 +4,7 @@
 #include "file/reader/file_reader.hpp"
 #include "validator/password_validator.hpp"
 #include "file/manager/file_manager.hpp"
+#include "parser/password_parser.hpp"
 
 int main() {
     const auto SAVED_PASSWORDS_PATH = fs::path {"C:\\Users\\Cezary Petryka\\Desktop\\password-manager\\cmake-build-debug\\saved_passwords"};
@@ -112,12 +113,22 @@ int main() {
             do_continue = {false};
         }
         else {
-            std::cout << "Wrong password!" << std::endl;
-            std::cout << "Try again!" << std::endl;
+            std::cout << "Wrong password! Try again!" << std::endl;
         }
     }
 
     // The result of the code above is the decrypted content of the file
+
+    std::vector<std::unique_ptr<Password>> passwords;
+    auto parser = PasswordParser{};
+
+    std::ranges::transform(decrypted_content, std::back_inserter(passwords), [&parser](const auto& line) {
+        return std::make_unique<Password>(*parser.parse(line));
+    });
+
+    std::ranges::for_each(passwords, [](const auto& password) {
+        std::cout << *password << std::endl;
+    });
 
     return 0;
 }
