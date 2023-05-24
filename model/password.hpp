@@ -13,7 +13,6 @@
 class Password {
     std::string description;
     std::string password;
-    // TODO: use enum
     std::string category;
     std::optional<std::string> website_address;
     std::optional<std::string> login;

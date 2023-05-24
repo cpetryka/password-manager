@@ -9,7 +9,6 @@
 
 struct FileManager {
     static bool check_if_file_exists(const fs::path& path) {
-        /*return fs::exists(path);*/
         return is_regular_file(fs::path(path));
     }
 

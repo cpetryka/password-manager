@@ -8,7 +8,11 @@
 #include "../libs/libs.hpp"
 
 struct Validator {
+    Validator() = default;
+
     virtual bool validate(const std::string& expression) const = 0;
+
+    virtual ~Validator() = default;
 };
 
 #endif //PASSWORD_MANAGER_VALIDATOR_HPP

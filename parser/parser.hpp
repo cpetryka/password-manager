@@ -10,7 +10,11 @@
 // T - output type
 template<typename T>
 struct Parser {
+    Parser() = default;
+
     virtual T parse(const std::string& expression) = 0;
+
+    virtual ~Parser() = default;
 };
 
 
