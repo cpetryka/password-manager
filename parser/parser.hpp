@@ -20,7 +20,7 @@ struct Parser {
      * @param std::string representing some expression
      * @return T which is the output type
      */
-    virtual T parse(const std::string& expression) = 0;
+    virtual T parse(const std::string& expression, const std::string& separator) = 0;
 
     virtual ~Parser() = default;
 };

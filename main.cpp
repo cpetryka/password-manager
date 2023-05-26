@@ -9,6 +9,7 @@
 
 int main() {
     const auto SAVED_PASSWORDS_PATH = fs::path {"C:\\Users\\Cezary Petryka\\Desktop\\password-manager\\cmake-build-debug\\saved_passwords"};
+    const auto SEPARATOR = std::string {";"};
 
     std::cout << "Welcome to Password Manager!" << std::endl;
     std::cout << "Decide whether you want to use one of the saved files with passwords or if you want to provide your own path." << std::endl;
@@ -26,51 +27,13 @@ int main() {
     // Decryption of the file
     auto decrypted_content = Menu::get_password_and_decrypt(path);
 
-    /*auto file_content = FileReader::read(path.string());
-
-    auto do_continue {true};
-    auto password = std::string {};
-    auto decrypted_content = std::vector<std::string> {};
-    auto attempts {0};
-
-    while(do_continue) {
-        // If user exceeds 3 attempts, then exit the program
-        if(attempts++ == 3) {
-            std::cout << "You've exceeded the number of attempts!" << std::endl;
-            std::cout << "Exiting..." << std::endl;
-            return 0;
-        }
-
-        // Get password from user
-        std::cout << "Enter your password: ";
-        std::getline(std::cin, password);
-
-        // Decrypt file content
-        decrypted_content = Encryptor::decrypt_all(file_content, password);
-
-        // Validate decrypted content
-        auto validator = PasswordValidator{};
-
-        auto res = std::ranges::all_of(decrypted_content, [&validator](const auto& line) {
-            return validator.validate(line) || line.empty();
-        });
-
-        // Final actions
-        if(res) {
-            do_continue = {false};
-        }
-        else {
-            std::cout << "Wrong password! Try again!" << std::endl;
-        }
-    }*/
-
     // The result of the code above is the decrypted content of the file
 
     std::vector<std::unique_ptr<Password>> passwords;
     auto parser = PasswordParser{};
 
-    std::ranges::transform(decrypted_content, std::back_inserter(passwords), [&parser](const auto& line) {
-        return std::make_unique<Password>(*parser.parse(line));
+    std::ranges::transform(decrypted_content, std::back_inserter(passwords), [&parser, &SEPARATOR](const auto& line) {
+        return std::make_unique<Password>(*parser.parse(line, SEPARATOR));
     });
 
     std::ranges::for_each(passwords, [](const auto& password) {

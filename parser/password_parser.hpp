@@ -19,8 +19,8 @@ struct PasswordParser : Parser<std::unique_ptr<Password>> {
      * @param std::string representing some expression
      * @return std::unique_ptr<Password> which is the generic type specified earlier
      */
-    std::unique_ptr<Password> parse(const std::string& expression) override {
-        auto split = Utilities::split(expression, ";");
+    std::unique_ptr<Password> parse(const std::string& expression, const std::string& separator) override {
+        auto split = Utilities::split(expression, separator);
         return std::make_unique<Password>(split[0], split[1], split[2], split[3], split[4]);
     }
 };
