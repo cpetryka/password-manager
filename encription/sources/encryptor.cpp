@@ -6,13 +6,13 @@
 
 std::string Encryptor::encrypt(const std::string &expression, const std::string& password)  {
     std::string encrypted_expression;
-    auto first_last_letters_difference = std::abs(password.front() - password.back());
+    auto encryption_seed = (std::abs(password.front() - password.back()) + password.size()) % 11 + 10;
 
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
-            encrypted_expression += static_cast<char>(expression[i] + first_last_letters_difference);
+            encrypted_expression += static_cast<char>(expression[i] + encryption_seed);
         } else {
-            encrypted_expression += static_cast<char>(expression[i] - first_last_letters_difference);
+            encrypted_expression += static_cast<char>(expression[i] - encryption_seed);
         }
     }
 
@@ -21,13 +21,13 @@ std::string Encryptor::encrypt(const std::string &expression, const std::string&
 
 std::string Encryptor::decrypt(const std::string &expression, const std::string& password) {
     std::string decrypted_expression;
-    auto first_last_letters_difference = std::abs(password.front() - password.back());
+    auto encryption_seed = (std::abs(password.front() - password.back()) + password.size()) % 11 + 10;
 
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
-            decrypted_expression += static_cast<char>(expression[i] - first_last_letters_difference);
+            decrypted_expression += static_cast<char>(expression[i] - encryption_seed);
         } else {
-            decrypted_expression += static_cast<char>(expression[i] + first_last_letters_difference);
+            decrypted_expression += static_cast<char>(expression[i] + encryption_seed);
         }
     }
 

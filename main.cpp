@@ -76,7 +76,7 @@ int main() {
     std::ranges::for_each(passwords, [](const auto& password) {
         std::cout << *password << std::endl;
     });
-
+    
     // The result of the code above is the vector of Password objects
 
     return 0;
