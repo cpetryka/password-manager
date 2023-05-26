@@ -15,7 +15,21 @@
 class PasswordManager {
     std::vector<std::unique_ptr<Password>> passwords;
 public:
-    PasswordManager();
+    PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
+
+    PasswordManager(const PasswordManager& pm) noexcept;
+    PasswordManager(PasswordManager&& pm) noexcept;
+
+    PasswordManager& operator=(const PasswordManager& pm);
+    PasswordManager& operator=(PasswordManager&& pm) noexcept;
+
+    friend std::ostream& operator<<(std::ostream& out, const PasswordManager& pm) noexcept {
+        std::ranges::for_each(pm.passwords, [&out](const auto& password) {
+            out << *password << '\n';
+        });
+
+        return out;
+    }
 };
 
 

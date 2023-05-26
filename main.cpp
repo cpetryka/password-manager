@@ -6,6 +6,7 @@
 #include "file/manager/file_manager.hpp"
 #include "parser/password_parser.hpp"
 #include "menu/menu.hpp"
+#include "service/password_manager.hpp"
 
 int main() {
     const auto SAVED_PASSWORDS_PATH = fs::path {"C:\\Users\\Cezary Petryka\\Desktop\\password-manager\\cmake-build-debug\\saved_passwords"};
@@ -22,12 +23,8 @@ int main() {
         return 0;
     }
 
-    // ...
-
     // Decryption of the file
     auto decrypted_content = Menu::get_password_and_decrypt(path);
-
-    // The result of the code above is the decrypted content of the file
 
     std::vector<std::unique_ptr<Password>> passwords;
 
@@ -35,11 +32,9 @@ int main() {
         return std::make_unique<Password>(PasswordParser::parse(line, SEPARATOR));
     });
 
-    std::ranges::for_each(passwords, [](const auto& password) {
-        std::cout << *password << std::endl;
-    });
-
-    // The result of the code above is the vector of Password objects
+    // Creating a PasswordManager object
+    auto password_manager = PasswordManager {passwords};
+    std::cout << password_manager << std::endl;
 
     return 0;
 }
