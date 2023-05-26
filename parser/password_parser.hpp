@@ -5,7 +5,6 @@
 #ifndef PASSWORD_MANAGER_PASSWORD_PARSER_HPP
 #define PASSWORD_MANAGER_PASSWORD_PARSER_HPP
 
-#include "parser.hpp"
 #include "../model/password.hpp"
 #include "../validator/password_validator.hpp"
 #include "../utilities/utilities.hpp"
@@ -13,15 +12,16 @@
 /**
  * @brief Class for parsing passwords
  */
-struct PasswordParser : Parser<std::unique_ptr<Password>> {
+struct PasswordParser {
     /**
-     * @brief Parses expression passed as an argument
+     * @brief Parses an expression passed as an argument
      * @param std::string representing some expression
-     * @return std::unique_ptr<Password> which is the generic type specified earlier
+     * @param std::string representing a separator
+     * @return Password which is the generic type specified earlier
      */
-    std::unique_ptr<Password> parse(const std::string& expression, const std::string& separator) override {
+    static Password parse(const std::string& expression, const std::string& separator) {
         auto split = Utilities::split(expression, separator);
-        return std::make_unique<Password>(split[0], split[1], split[2], split[3], split[4]);
+        return Password{split[0], split[1], split[2], split[3], split[4]};
     }
 };
 

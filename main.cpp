@@ -30,10 +30,9 @@ int main() {
     // The result of the code above is the decrypted content of the file
 
     std::vector<std::unique_ptr<Password>> passwords;
-    auto parser = PasswordParser{};
 
-    std::ranges::transform(decrypted_content, std::back_inserter(passwords), [&parser, &SEPARATOR](const auto& line) {
-        return std::make_unique<Password>(*parser.parse(line, SEPARATOR));
+    std::ranges::transform(decrypted_content, std::back_inserter(passwords), [&SEPARATOR](const auto& line) {
+        return std::make_unique<Password>(PasswordParser::parse(line, SEPARATOR));
     });
 
     std::ranges::for_each(passwords, [](const auto& password) {

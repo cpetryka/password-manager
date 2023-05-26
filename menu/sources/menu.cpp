@@ -95,10 +95,8 @@ std::vector<std::string> Menu::get_password_and_decrypt(const fs::path& path_to_
         decrypted_content = Encryptor::decrypt_all(file_content, password);
 
         // Validate decrypted content
-        auto validator = PasswordValidator{};
-
-        auto res = std::ranges::all_of(decrypted_content, [&validator](const auto& line) {
-            return validator.validate(line) || line.empty();
+        auto res = std::ranges::all_of(decrypted_content, [](const auto& line) {
+            return PasswordValidator::validate(line) || line.empty();
         });
 
         // Final actions
