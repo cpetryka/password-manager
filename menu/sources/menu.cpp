@@ -70,3 +70,45 @@ fs::path Menu::get_path_to_file_with_passwords_from_user(const fs::path& path_to
         return path;
     }
 }
+
+std::vector<std::string> Menu::get_password_and_decrypt(const fs::path& path_to_file_with_passwords) {
+    auto file_content = FileReader::read(path_to_file_with_passwords.string());
+
+    auto do_continue {true};
+    auto password = std::string {};
+    auto decrypted_content = std::vector<std::string> {};
+    auto attempts {0};
+
+    while(do_continue) {
+        // If user exceeds 3 attempts, then exit the program
+        if(attempts++ == 3) {
+            std::cout << "You've exceeded the number of attempts!" << std::endl;
+            std::cout << "Exiting..." << std::endl;
+            break;
+        }
+
+        // Get password from user
+        std::cout << "Enter your password: ";
+        std::getline(std::cin, password);
+
+        // Decrypt file content
+        decrypted_content = Encryptor::decrypt_all(file_content, password);
+
+        // Validate decrypted content
+        auto validator = PasswordValidator{};
+
+        auto res = std::ranges::all_of(decrypted_content, [&validator](const auto& line) {
+            return validator.validate(line) || line.empty();
+        });
+
+        // Final actions
+        if(res) {
+            do_continue = {false};
+        }
+        else {
+            std::cout << "Wrong password! Try again!" << std::endl;
+        }
+    }
+
+    return decrypted_content;
+}

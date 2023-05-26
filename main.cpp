@@ -23,15 +23,15 @@ int main() {
 
     // ...
 
-    auto do_continue {true};
-
     // Decryption of the file
-    auto file_content = FileReader::read(path.string());
+    auto decrypted_content = Menu::get_password_and_decrypt(path);
 
-    do_continue = {true};
+    /*auto file_content = FileReader::read(path.string());
+
+    auto do_continue {true};
     auto password = std::string {};
     auto decrypted_content = std::vector<std::string> {};
-    auto attempts = 0;
+    auto attempts {0};
 
     while(do_continue) {
         // If user exceeds 3 attempts, then exit the program
@@ -62,7 +62,7 @@ int main() {
         else {
             std::cout << "Wrong password! Try again!" << std::endl;
         }
-    }
+    }*/
 
     // The result of the code above is the decrypted content of the file
 
@@ -76,7 +76,7 @@ int main() {
     std::ranges::for_each(passwords, [](const auto& password) {
         std::cout << *password << std::endl;
     });
-    
+
     // The result of the code above is the vector of Password objects
 
     return 0;

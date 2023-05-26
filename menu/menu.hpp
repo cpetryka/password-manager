@@ -7,6 +7,10 @@
 
 #include "../libs/libs.hpp"
 #include "../file/manager/file_manager.hpp"
+#include "../file/reader/file_reader.hpp"
+#include "../file/writer/file_writer.hpp"
+#include "../encription/encryptor.hpp"
+#include "../validator/password_validator.hpp"
 
 /**
  * @brief Class representing a menu
@@ -19,6 +23,7 @@ struct Menu {
      * @return std::filesystem::path representing a path to a chosen file
      */
     static fs::path get_path_to_file_with_passwords_from_user(const fs::path& path_to_files_with_saved_passwords);
+    static std::vector<std::string> get_password_and_decrypt(const fs::path& path_to_file_with_passwords);
 };
 
 
