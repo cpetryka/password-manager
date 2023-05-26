@@ -11,8 +11,9 @@ std::string Encryptor::encrypt(const std::string &expression, const std::string&
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
             encrypted_expression += static_cast<char>(expression[i] + encryption_seed);
-        } else {
-            encrypted_expression += static_cast<char>(expression[i] - encryption_seed);
+        }
+        else {
+            encrypted_expression += static_cast<char>(expression[i] + (encryption_seed % 8 + 4));
         }
     }
 
@@ -26,8 +27,9 @@ std::string Encryptor::decrypt(const std::string &expression, const std::string&
     for(auto i = 0; i < expression.size(); ++i) {
         if(i % 2 == 0) {
             decrypted_expression += static_cast<char>(expression[i] - encryption_seed);
-        } else {
-            decrypted_expression += static_cast<char>(expression[i] + encryption_seed);
+        }
+        else {
+            decrypted_expression += static_cast<char>(expression[i] - (encryption_seed % 8 + 4));
         }
     }
 
