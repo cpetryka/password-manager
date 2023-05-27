@@ -20,6 +20,21 @@ struct Utilities {
      * @return std::vector<std::string> containing split expressions
      */
     static std::vector<std::string> split(const std::string& expression, const std::string& delimiter);
+
+    /**
+     * @brief Converts expression to lowercase
+     * @param expression
+     * @return std::string containing expression in lowercase
+     */
+    static std::string to_lowercase(const std::string& expression);
+
+    /**
+     * @brief Checks if expression contains substring (case insensitive)
+     * @param expression
+     * @param substring
+     * @return true if expression contains substring, false otherwise
+     */
+    static bool contains_case_insensitive(const std::string& expression, const std::string& substring);
 };
 
 

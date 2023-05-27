@@ -16,6 +16,9 @@
 #include <regex>
 #include <filesystem>
 #include <stdexcept>
+#include <utility>
+#include <ostream>
+#include <sstream>
 
 namespace fs = std::filesystem;
 

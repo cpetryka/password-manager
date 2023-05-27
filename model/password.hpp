@@ -5,8 +5,8 @@
 #ifndef PASSWORD_MANAGER_PASSWORD_HPP
 #define PASSWORD_MANAGER_PASSWORD_HPP
 
-#include <ostream>
-#include "../libs/libs.hpp"
+#include "password_field.hpp"
+#include "../utilities/utilities.hpp"
 
 /**
  * @brief Class representing a password
@@ -21,6 +21,14 @@ class Password {
 public:
     Password(const std::string &name, const std::string &password, const std::string &category,
              const std::optional<std::string> &websiteAddress, const std::optional<std::string> &login);
+
+    /**
+     * @brief Checks if the password matches the given criteria
+     * @param field
+     * @param value
+     * @return true if the password matches the given criteria, false otherwise
+     */
+    bool check_match(const password_field& field, const std::string& value) const noexcept;
 
     friend std::ostream& operator<<(std::ostream& out, const Password& password);
 };

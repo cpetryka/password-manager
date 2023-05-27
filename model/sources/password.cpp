@@ -9,6 +9,25 @@ Password::Password(const std::string& name, const std::string& password, const s
                    : description(name), password(password), category(category), website_address(websiteAddress),
                    login(login) {}
 
+bool Password::check_match(const password_field &field, const std::string &value) const noexcept {
+    if(field == password_field::DESCRIPTION) {
+        return Utilities::contains_case_insensitive(description, value);
+    }
+    else if(field == password_field::PASSWORD) {
+        return password == value;
+    }
+    else if(field == password_field::CATEGORY) {
+        return category == value;
+    }
+    else if(field == password_field::WEBSITE_ADDRESS) {
+        return Utilities::contains_case_insensitive(website_address.value_or(""), value);
+    }
+    else if(field == password_field::LOGIN) {
+        return login.value_or("") == value;
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& out, const Password& password) {
     return out << "PASSWORD{ DESCRIPTION: " << password.description << ", PASSWORD: " << password.password
                << ", CATEGORY: " << password.category << ", WEBSITE ADDRESS: " << password.website_address.value_or("-")

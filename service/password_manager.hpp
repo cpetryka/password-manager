@@ -7,6 +7,7 @@
 
 #include "../libs/libs.hpp"
 #include "../model/password.hpp"
+#include "../model/password_field.hpp"
 
 /**
  * @brief Class representing a password manager
@@ -14,6 +15,12 @@
  */
 class PasswordManager {
     std::vector<std::unique_ptr<Password>> passwords;
+
+    /**
+     * @brief Gets criteria (for sorting, filtering etc.) from user
+     * @return std::vector<std::pair<password_field, std::string>> containing criteria
+     */
+    static std::vector<std::pair<password_field, std::string>> get_criteria_from_user() noexcept;
 public:
     PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
 
@@ -23,13 +30,19 @@ public:
     PasswordManager& operator=(const PasswordManager& pm);
     PasswordManager& operator=(PasswordManager&& pm) noexcept;
 
-    friend std::ostream& operator<<(std::ostream& out, const PasswordManager& pm) noexcept {
-        std::ranges::for_each(pm.passwords, [&out](const auto& password) {
-            out << *password << '\n';
-        });
+    /**
+     * @brief Returns passwords that match the given criteria
+     * @return std::vector<std::unique_ptr<Password>> containing passwords that match the given criteria
+     */
+    std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
 
-        return out;
-    }
+    /**
+     * @brief Shows a menu for the user
+     * @details The user can choose what to do with the passwords (e.g. sort, filter, add, remove etc.)
+     */
+    void menu() noexcept;
+
+    friend std::ostream& operator<<(std::ostream& out, const PasswordManager& pm) noexcept;
 };
 
 

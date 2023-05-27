@@ -20,3 +20,16 @@ std::vector<std::string> Utilities::split(const std::string& expression, const s
 
     return result;
 }
+
+std::string Utilities::to_lowercase(const std::string &expression) {
+    auto expr = expression;
+    std::ranges::transform(expr, expr.begin(), ::tolower);
+    return expr;
+}
+
+bool Utilities::contains_case_insensitive(const std::string &expression, const std::string &substring) {
+    auto expr = Utilities::to_lowercase(expression);
+    auto sub = Utilities::to_lowercase(substring);
+
+    return expr.find(sub) != std::string::npos;
+}

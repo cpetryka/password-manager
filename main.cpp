@@ -34,7 +34,7 @@ int main() {
 
     // Creating a PasswordManager object
     auto password_manager = PasswordManager {passwords};
-    std::cout << password_manager << std::endl;
+    password_manager.menu();
 
     return 0;
 }
