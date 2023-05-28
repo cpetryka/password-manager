@@ -30,20 +30,34 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteri
     return criteria;
 }
 
+void PasswordManager::refresh_categories_set() noexcept {
+    // clear the set because there might be some old categories that are no longer in use
+    categories.clear();
+
+    for (const auto& password_ptr : passwords) {
+        categories.emplace(Utilities::to_lowercase(password_ptr->get_category()));
+    }
+}
 
 PasswordManager::PasswordManager(const std::vector<std::unique_ptr<Password>> &passwords) noexcept {
     std::ranges::for_each(passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
+
+    refresh_categories_set();
 }
 
 PasswordManager::PasswordManager(const PasswordManager &pm) noexcept {
     std::ranges::for_each(pm.passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
+
+    refresh_categories_set();
 }
 
-PasswordManager::PasswordManager(PasswordManager &&pm) noexcept : passwords {std::move(pm.passwords)} {}
+PasswordManager::PasswordManager(PasswordManager &&pm) noexcept : passwords {std::move(pm.passwords)} {
+    refresh_categories_set();
+}
 
 PasswordManager &PasswordManager::operator=(const PasswordManager &pm) {
     if(this == &pm) {
@@ -54,6 +68,8 @@ PasswordManager &PasswordManager::operator=(const PasswordManager &pm) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
 
+    refresh_categories_set();
+
     return *this;
 }
 
@@ -63,6 +79,8 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
     }
 
     passwords = std::move(pm.passwords);
+
+    refresh_categories_set();
 
     return *this;
 }
@@ -170,6 +188,21 @@ void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
     }
 }
 
+void PasswordManager::add_category_menu() noexcept {
+    std::cout << "========== ADDING CATEGORY ==========" << std::endl;
+    std::cout << "Provide category name: ";
+    auto category_name = std::string();
+    std::getline(std::cin, category_name);
+
+    if(categories.contains(category_name)) {
+        std::cout << "Category with this name already exists!" << std::endl;
+        return;
+    }
+
+    categories.emplace(Utilities::to_lowercase(category_name));
+    std::cout << "Category added successfully!" << std::endl;
+}
+
 void PasswordManager::menu() noexcept {
     auto choice {0};
 
@@ -179,6 +212,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "2. Show passwords that match the given criteria" << std::endl;
         std::cout << "5. Edit password" << std::endl;
         std::cout << "6. Remove passwords" << std::endl;
+        std::cout << "7. Add category" << std::endl;
         std::cout << "9. Exit" << std::endl;
 
         std::cout << "Your choice: ";
@@ -207,6 +241,14 @@ void PasswordManager::menu() noexcept {
                 break;
             case 6:
                 remove_passwords_menu();
+                break;
+            case 7:
+                add_category_menu();
+
+                std::cout << "The categories are now: " << std::endl;
+                std::ranges::for_each(categories, [](const auto& category) {
+                    std::cout << category << std::endl;
+                });
                 break;
             case 9:
                 return;

@@ -9,6 +9,10 @@ Password::Password(const std::string& name, const std::string& password, const s
                    : description(name), password(password), category(category), website_address(websiteAddress),
                    login(login) {}
 
+std::string Password::get_category() const noexcept {
+    return category;
+}
+
 bool Password::check_match(const password_field &field, const std::string &value) const noexcept {
     if(field == password_field::DESCRIPTION) {
         return Utilities::contains_case_insensitive(description, value);

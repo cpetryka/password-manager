@@ -8,6 +8,7 @@
 #include "../libs/libs.hpp"
 #include "../model/password.hpp"
 #include "../model/password_field.hpp"
+#include "../utilities/utilities.hpp"
 
 /**
  * @brief Class representing a password manager
@@ -15,12 +16,14 @@
  */
 class PasswordManager {
     std::vector<std::unique_ptr<Password>> passwords;
+    std::set<std::string> categories;
 
     /**
      * @brief Gets criteria (for sorting, filtering etc.) from user
      * @return std::vector<std::pair<password_field, std::string>> containing criteria
      */
     static std::vector<std::pair<password_field, std::string>> get_criteria_from_user() noexcept;
+    void refresh_categories_set() noexcept;
 public:
     explicit PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
 
@@ -52,6 +55,11 @@ public:
      * @param indexes vector of indexes of passwords to be removed
      */
     void remove_passwords_at_indexes(std::vector<int>& indexes);
+
+    /**
+     * @brief Adds a new category
+     */
+    void add_category_menu() noexcept;
 
     /**
      * @brief Shows a menu for the user

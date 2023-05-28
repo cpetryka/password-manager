@@ -23,6 +23,8 @@ public:
     Password(const std::string &name, const std::string &password, const std::string &category,
              const std::optional<std::string> &websiteAddress, const std::optional<std::string> &login);
 
+    std::string get_category() const noexcept;
+
     /**
      * @brief Checks if the password matches the given criteria
      * @param field
