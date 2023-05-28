@@ -111,13 +111,13 @@ void PasswordManager::edit_password_menu() noexcept {
     auto i = 0;
 
     do {
-        if(i++ > 0) {
-            std::cout << "Invalid value!" << std::endl;
-        }
-
         if(i == 3) {
             std::cout << "You have entered invalid value 3 times. Cancelling..." << std::endl;
             return;
+        }
+
+        if(i++ > 0) {
+            std::cout << "Invalid value!" << std::endl;
         }
 
         std::cout << "Provide new value: ";
@@ -202,7 +202,7 @@ void PasswordManager::menu() noexcept {
                     });
                 }
                 break;
-            case 4:
+            case 5:
                 edit_password_menu();
                 break;
             case 6:
