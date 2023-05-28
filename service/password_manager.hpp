@@ -22,7 +22,7 @@ class PasswordManager {
      */
     static std::vector<std::pair<password_field, std::string>> get_criteria_from_user() noexcept;
 public:
-    PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
+    explicit PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
 
     PasswordManager(const PasswordManager& pm) noexcept;
     PasswordManager(PasswordManager&& pm) noexcept;
@@ -35,6 +35,18 @@ public:
      * @return std::vector<std::unique_ptr<Password>> containing passwords that match the given criteria
      */
     std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
+
+    /**
+     * @brief Removes passwords chosen by the user
+     * @details Shows all passwords and asks the user which passwords should be removed
+     */
+    void remove_passwords_menu();
+
+    /**
+     * @brief Removes passwords at given indexes
+     * @param indexes vector of indexes of passwords to be removed
+     */
+    void remove_passwords_at_indexes(std::vector<int>& indexes);
 
     /**
      * @brief Shows a menu for the user

@@ -22,6 +22,14 @@ struct Utilities {
     static std::vector<std::string> split(const std::string& expression, const std::string& delimiter);
 
     /**
+     * @brief Splits expression by specified delimiter and converts it to numbers
+     * @param std::string representing some expression
+     * @param std::string representing delimiter
+     * @return std::vector<int> containing split expressions converted to numbers
+     */
+    static std::vector<int> split_to_numbers(const std::string& expression, const std::string& delimiter);
+
+    /**
      * @brief Converts expression to lowercase
      * @param expression
      * @return std::string containing expression in lowercase

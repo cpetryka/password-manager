@@ -21,6 +21,15 @@ std::vector<std::string> Utilities::split(const std::string& expression, const s
     return result;
 }
 
+std::vector<int> Utilities::split_to_numbers(const std::string &expression, const std::string &delimiter) {
+    auto split = Utilities::split(expression, delimiter);
+    std::vector<int> result;
+    std::ranges::transform(split, std::back_inserter(result), [](const auto& elem) {
+        return std::stoi(elem);
+    });
+    return result;
+}
+
 std::string Utilities::to_lowercase(const std::string &expression) {
     auto expr = expression;
     std::ranges::transform(expr, expr.begin(), ::tolower);
