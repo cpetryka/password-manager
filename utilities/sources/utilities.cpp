@@ -36,6 +36,12 @@ std::string Utilities::to_lowercase(const std::string &expression) {
     return expr;
 }
 
+bool Utilities::contains_any(const std::string &expression, const std::string &substring) {
+    return std::ranges::any_of(expression, [&substring](const auto& elem) {
+        return substring.find(elem) != std::string::npos;
+    });
+}
+
 bool Utilities::contains_case_insensitive(const std::string &expression, const std::string &substring) {
     auto expr = Utilities::to_lowercase(expression);
     auto sub = Utilities::to_lowercase(substring);

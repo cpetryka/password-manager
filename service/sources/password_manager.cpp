@@ -26,7 +26,6 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteri
         }
     }
 
-
     return criteria;
 }
 
@@ -37,6 +36,29 @@ void PasswordManager::refresh_categories_set() noexcept {
     for (const auto& password_ptr : passwords) {
         categories.emplace(Utilities::to_lowercase(password_ptr->get_category()));
     }
+}
+
+bool PasswordManager::do_category_exists(const std::string &category) const noexcept {
+    return categories.contains(category);
+}
+
+std::string PasswordManager::get_categories_string() const noexcept {
+    auto result = std::string {"["};
+
+    for(const auto& category : categories) {
+        result += category + ", ";
+    }
+
+    // remove the last ", "
+    result = result.substr(0, result.size() - 2);
+
+    return result + "]";
+}
+
+bool PasswordManager::check_if_password_has_already_been_used(const std::string& password) const noexcept {
+    return std::ranges::any_of(passwords, [&password](const auto& password_ptr) {
+        return password_ptr->is_password_the_same(password);
+    });
 }
 
 PasswordManager::PasswordManager(const std::vector<std::unique_ptr<Password>> &passwords) noexcept {
@@ -106,6 +128,86 @@ std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept
     }
 
     return result;
+}
+
+void PasswordManager::add_password_menu() noexcept {
+    std::cout << "========== ADDING NEW PASSWORD ==========" << std::endl;
+
+    std::cout << "Provide description: ";
+    auto description = std::string {};
+    std::getline(std::cin, description);
+
+    std::cout << "Do you want to provide your own password (enter 1) or generate one (enter 2): ";
+    auto user_choice {-1};
+    std::cin >> user_choice; std::cin.get();
+
+    auto password = std::string {};
+
+    if(user_choice == 1) {
+        auto do_continue = true;
+
+        while(do_continue) {
+            std::cout << "Provide password: ";
+            std::getline(std::cin, password);
+
+            std::cout << "The strength of the password is: " << PasswordStrength::to_string(Password::get_password_strength(password)) << std::endl;
+
+            if(check_if_password_has_already_been_used(password)) {
+                std::cout << "WARNING! This password has already been used!" << std::endl;
+            }
+
+            std::cout << "Do you want to provide another password? (y/n): ";
+            auto answer = std::string {};
+            std::getline(std::cin, answer);
+
+            if(answer == "n") {
+                do_continue = false;
+            }
+        }
+    }
+    else if(user_choice == 2) {
+        std::cout << "How many characters should the password have? (min 8): ";
+        auto number_of_characters {-1};
+        std::cin >> number_of_characters; std::cin.get();
+
+        if(number_of_characters < 8) {
+            std::cout << "The number of characters cannot be less than 8! Exiting..." << std::endl;
+            return;
+        }
+
+        std::cout << "Should the password contain upper and lower case letters? (y/n): ";
+        auto answer = std::string {};
+        std::getline(std::cin, answer);
+
+        std::cout << "Should the password contain special characters? (y/n): ";
+        auto answer2 = std::string {};
+        std::getline(std::cin, answer2);
+
+        password = Password::generate_password(number_of_characters, answer == "y", answer2 == "y");
+    }
+    else {
+        std::cout << "There is no such option! Exiting..." << std::endl;
+        return;
+    }
+
+    std::cout << "Available categories: " << get_categories_string() << std::endl;
+    auto category = std::string {};
+    do {
+        std::cout << "Provide category: " << std::endl;
+        std::getline(std::cin, category);
+    } while(!do_category_exists(category));
+
+    auto website_address = std::string {};
+    do {
+        std::cout << "Provide website address (enter '-' if you do not want to provide a login): ";
+        std::getline(std::cin, website_address);
+    } while(!PasswordValidator::is_website_address_valid(website_address));
+
+    std::cout << "Provide login (enter '-' if you do not want to provide a login): ";
+    auto login = std::string {};
+    std::getline(std::cin, login);
+
+    passwords.emplace_back(std::make_unique<Password>(description, password, category, website_address, login));
 }
 
 void PasswordManager::edit_password_menu() noexcept {
@@ -232,6 +334,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "========== MAIN MENU ==========" << std::endl;
         std::cout << "1. Show all passwords" << std::endl;
         std::cout << "2. Show passwords that match the given criteria" << std::endl;
+        std::cout << "4. Add password" << std::endl;
         std::cout << "5. Edit password" << std::endl;
         std::cout << "6. Remove passwords" << std::endl;
         std::cout << "7. Add category" << std::endl;
@@ -258,6 +361,9 @@ void PasswordManager::menu() noexcept {
                         std::cout << *password << std::endl;
                     });
                 }
+                break;
+            case 4:
+                add_password_menu();
                 break;
             case 5:
                 edit_password_menu();

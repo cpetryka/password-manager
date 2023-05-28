@@ -7,8 +7,11 @@
 #include "parser/password_parser.hpp"
 #include "menu/menu.hpp"
 #include "service/password_manager.hpp"
+#include "utilities/utilities.hpp"
 
 int main() {
+    srand(time(nullptr));
+
     const auto SAVED_PASSWORDS_PATH = fs::path {"C:\\Users\\Cezary Petryka\\Desktop\\password-manager\\cmake-build-debug\\saved_passwords"};
     const auto SEPARATOR = std::string {";"};
 

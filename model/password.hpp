@@ -7,6 +7,7 @@
 
 #include "password_field.hpp"
 #include "../validator/password_validator.hpp"
+#include "../model/password_strength.hpp"
 #include "../utilities/utilities.hpp"
 
 /**
@@ -26,6 +27,13 @@ public:
     std::string get_category() const noexcept;
 
     /**
+     * @brief Checks if the password is the same as the given expression
+     * @param expression
+     * @return true if the password is the same as the given expression, false otherwise
+     */
+    bool is_password_the_same(const std::string& expression) const noexcept;
+
+    /**
      * @brief Checks if the password matches the given criteria
      * @param field
      * @param value
@@ -40,6 +48,17 @@ public:
      * @return true if the field was edited successfully, false otherwise
      */
     bool edit_password(const password_field& field, const std::string& new_value) noexcept;
+
+    /**
+     * @brief Generates a random password
+     * @param length
+     * @param upper_and_lowercase
+     * @param special_characters
+     * @return a random password
+     */
+    static std::string generate_password(const int length, const bool upper_and_lowercase, const bool special_characters) noexcept;
+
+    static password_strength get_password_strength(const std::string& expression) noexcept;
 
     friend std::ostream& operator<<(std::ostream& out, const Password& password);
 };

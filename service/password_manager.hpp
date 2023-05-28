@@ -8,6 +8,8 @@
 #include "../libs/libs.hpp"
 #include "../model/password.hpp"
 #include "../model/password_field.hpp"
+#include "../model/password_strength.hpp"
+#include "../validator/password_validator.hpp"
 #include "../utilities/utilities.hpp"
 
 /**
@@ -23,7 +25,31 @@ class PasswordManager {
      * @return std::vector<std::pair<password_field, std::string>> containing criteria
      */
     static std::vector<std::pair<password_field, std::string>> get_criteria_from_user() noexcept;
+
+    /**
+     * @brief Refreshes the set of categories
+     */
     void refresh_categories_set() noexcept;
+
+    /**
+     * @brief Checks if the category exists
+     * @param category
+     * @return true if the category exists, false otherwise
+     */
+    bool do_category_exists(const std::string& category) const noexcept;
+
+    /**
+     * @brief Gets all categories as a string
+     * @return std::string containing all categories
+     */
+    std::string get_categories_string() const noexcept;
+
+    /**
+     * @brief Checks if the password has already been used
+     * @param std::string containing the password
+     * @return true if the password has already been used, false otherwise
+     */
+    bool check_if_password_has_already_been_used(const std::string& password) const noexcept;
 public:
     explicit PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
 
@@ -38,6 +64,11 @@ public:
      * @return std::vector<std::unique_ptr<Password>> containing passwords that match the given criteria
      */
     std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
+
+    /**
+     * @brief Adds a new password
+     */
+    void add_password_menu() noexcept;
 
     /**
      * @brief Allows the user to edit the selected password

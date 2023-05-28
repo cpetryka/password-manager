@@ -37,6 +37,14 @@ struct Utilities {
     static std::string to_lowercase(const std::string& expression);
 
     /**
+     * @brief Checks if expression contains at least one character from the given substring
+     * @param expression
+     * @param substring
+     * @return true if expression contains at least one character from the given substring, false otherwise
+     */
+    static bool contains_any(const std::string& expression, const std::string& substring);
+
+    /**
      * @brief Checks if expression contains substring (case insensitive)
      * @param expression
      * @param substring

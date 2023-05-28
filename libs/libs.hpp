@@ -20,6 +20,8 @@
 #include <ostream>
 #include <sstream>
 #include <set>
+#include <ctime>
+#include <cstdlib>
 
 namespace fs = std::filesystem;
 

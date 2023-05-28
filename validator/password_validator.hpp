@@ -25,7 +25,7 @@ struct PasswordValidator {
      * @param std::string representing password
      * @return true if expression is a valid password, false otherwise
      */
-    static bool is_valid_password(const std::string& expression) {
+    static bool is_password_valid(const std::string& expression) {
         return std::regex_match(expression, std::regex(".{8,30}"));
     }
 
@@ -34,7 +34,7 @@ struct PasswordValidator {
      * @param std::string representing website address
      * @return true if expression is a valid website address, false otherwise
      */
-    static bool is_valid_website_address(const std::string& expression) {
+    static bool is_website_address_valid(const std::string& expression) {
         return std::regex_match(expression, std::regex("(-|www\\..+\\.(pl|com|org))"));
     }
 };
