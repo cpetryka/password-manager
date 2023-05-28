@@ -62,6 +62,11 @@ public:
     void add_category_menu() noexcept;
 
     /**
+     * @brief Removes a category and all passwords that belong to it
+     */
+    void remove_category_menu() noexcept;
+
+    /**
      * @brief Shows a menu for the user
      * @details The user can choose what to do with the passwords (e.g. sort, filter, add, remove etc.)
      */

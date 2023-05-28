@@ -203,6 +203,28 @@ void PasswordManager::add_category_menu() noexcept {
     std::cout << "Category added successfully!" << std::endl;
 }
 
+void PasswordManager::remove_category_menu() noexcept {
+    std::cout << "========== REMOVING CATEGORY ==========" << std::endl;
+    std::cout << "Provide category name: ";
+    auto category_name = std::string();
+    std::getline(std::cin, category_name);
+
+    if(!categories.contains(Utilities::to_lowercase(category_name))) {
+        std::cout << "Category with this name does not exist!" << std::endl;
+        return;
+    }
+
+    categories.erase(Utilities::to_lowercase(category_name));
+    std::cout << "Category removed successfully!" << std::endl;
+
+    // Remove all passwords that were in this category
+    auto to_erase = std::ranges::remove_if(passwords, [&category_name](const auto& password) {
+        return password->get_category() == category_name;
+    });
+
+    passwords.erase(to_erase.begin(), to_erase.end());
+}
+
 void PasswordManager::menu() noexcept {
     auto choice {0};
 
@@ -213,6 +235,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "5. Edit password" << std::endl;
         std::cout << "6. Remove passwords" << std::endl;
         std::cout << "7. Add category" << std::endl;
+        std::cout << "8. Remove category" << std::endl;
         std::cout << "9. Exit" << std::endl;
 
         std::cout << "Your choice: ";
@@ -250,6 +273,9 @@ void PasswordManager::menu() noexcept {
                     std::cout << category << std::endl;
                 });
                 break;
+            case 8:
+                remove_category_menu();
+                break;
             case 9:
                 return;
             default:
@@ -257,7 +283,6 @@ void PasswordManager::menu() noexcept {
         }
     }
 }
-
 
 std::ostream &operator<<(std::ostream &out, const PasswordManager &pm) noexcept {
     std::ranges::for_each(pm.passwords, [&out](const auto& password) {
