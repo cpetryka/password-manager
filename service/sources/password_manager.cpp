@@ -90,6 +90,41 @@ std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept
     return result;
 }
 
+void PasswordManager::edit_password_menu() noexcept {
+    std::cout << "========== PASSWORDS ==========" << std::endl;
+    for (int i = 0; i < passwords.size(); ++i) {
+        std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
+    }
+
+    std::cout << "Which password do you want to edit? Enter number (0 to cancel): ";
+    auto user_choice {-1};
+    std::cin >> user_choice; std::cin.get();
+
+    if(user_choice == 0) {
+        return;
+    }
+    std::cout << "========== EDITING PASSWORD ==========" << std::endl;
+    std::cout << "What do you want to edit?" << std::endl;
+    auto field = PasswordField::choose_field_menu();
+
+    auto new_value = std::string();
+    auto i = 0;
+
+    do {
+        if(i++ > 0) {
+            std::cout << "Invalid value!" << std::endl;
+        }
+
+        if(i == 3) {
+            std::cout << "You have entered invalid value 3 times. Cancelling..." << std::endl;
+            return;
+        }
+
+        std::cout << "Provide new value: ";
+        std::getline(std::cin, new_value);
+    } while (!passwords[user_choice - 1]->edit_password(field, new_value));
+}
+
 void PasswordManager::remove_passwords_menu() {
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
@@ -142,6 +177,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "========== MAIN MENU ==========" << std::endl;
         std::cout << "1. Show all passwords" << std::endl;
         std::cout << "2. Show passwords that match the given criteria" << std::endl;
+        std::cout << "5. Edit password" << std::endl;
         std::cout << "6. Remove passwords" << std::endl;
         std::cout << "9. Exit" << std::endl;
 
@@ -165,6 +201,9 @@ void PasswordManager::menu() noexcept {
                         std::cout << *password << std::endl;
                     });
                 }
+                break;
+            case 4:
+                edit_password_menu();
                 break;
             case 6:
                 remove_passwords_menu();

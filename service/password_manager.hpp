@@ -37,6 +37,11 @@ public:
     std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
 
     /**
+     * @brief Allows the user to edit the selected password
+     */
+    void edit_password_menu() noexcept;
+
+    /**
      * @brief Removes passwords chosen by the user
      * @details Shows all passwords and asks the user which passwords should be removed
      */

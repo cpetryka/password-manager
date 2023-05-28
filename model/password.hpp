@@ -6,6 +6,7 @@
 #define PASSWORD_MANAGER_PASSWORD_HPP
 
 #include "password_field.hpp"
+#include "../validator/password_validator.hpp"
 #include "../utilities/utilities.hpp"
 
 /**
@@ -29,6 +30,14 @@ public:
      * @return true if the password matches the given criteria, false otherwise
      */
     bool check_match(const password_field& field, const std::string& value) const noexcept;
+
+    /**
+     * @brief Edits the specified field of the password
+     * @param field field to be edited
+     * @param new_value new value of the field
+     * @return true if the field was edited successfully, false otherwise
+     */
+    bool edit_password(const password_field& field, const std::string& new_value) noexcept;
 
     friend std::ostream& operator<<(std::ostream& out, const Password& password);
 };
