@@ -58,7 +58,14 @@ public:
      */
     static std::string generate_password(const int length, const bool upper_and_lowercase, const bool special_characters) noexcept;
 
+    /**
+     * @brief Gets the strength of the password
+     * @param std::string containing the password
+     * @return password_strength enum
+     */
     static password_strength get_password_strength(const std::string& expression) noexcept;
+
+    std::string get_raw_string(const std::string& separator) const noexcept;
 
     friend std::ostream& operator<<(std::ostream& out, const Password& password);
 };

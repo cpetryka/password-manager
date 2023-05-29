@@ -10,6 +10,8 @@
 #include "../model/password_field.hpp"
 #include "../model/password_strength.hpp"
 #include "../validator/password_validator.hpp"
+#include "../file/writer/file_writer.hpp"
+#include "../encription/encryptor.hpp"
 #include "../utilities/utilities.hpp"
 
 /**
@@ -17,6 +19,8 @@
  * @details This class is used to manage passwords.
  */
 class PasswordManager {
+    fs::path path_to_file_with_passwords;
+    std::string master_password;
     std::vector<std::unique_ptr<Password>> passwords;
     std::set<std::string> categories;
 
@@ -46,12 +50,18 @@ class PasswordManager {
 
     /**
      * @brief Checks if the password has already been used
+     * @param std::filesystem::path path to the file with passwords
      * @param std::string containing the password
      * @return true if the password has already been used, false otherwise
      */
     bool check_if_password_has_already_been_used(const std::string& password) const noexcept;
+
+    /**
+     * @brief Generates a vector of strings that will be saved to the file
+     */
+    std::vector<std::string> generate_decrypted_output_vector() const noexcept;
 public:
-    explicit PasswordManager(const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
+    explicit PasswordManager(const fs::path& path_to_file_with_passwords, const std::string& master_password, const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
 
     PasswordManager(const PasswordManager& pm) noexcept;
     PasswordManager(PasswordManager&& pm) noexcept;

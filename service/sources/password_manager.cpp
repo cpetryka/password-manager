@@ -61,7 +61,21 @@ bool PasswordManager::check_if_password_has_already_been_used(const std::string&
     });
 }
 
-PasswordManager::PasswordManager(const std::vector<std::unique_ptr<Password>> &passwords) noexcept {
+std::vector<std::string> PasswordManager::generate_decrypted_output_vector() const noexcept {
+    auto result = std::vector<std::string> {};
+
+    std::ranges::for_each(passwords, [&](const auto& password_ptr) {
+        result.emplace_back(Encryptor::encrypt(password_ptr->get_raw_string(";"), master_password));
+    });
+
+    return result;
+}
+
+PasswordManager::PasswordManager(const fs::path& path_to_file_with_passwords,
+                                 const std::string& master_password,
+                                 const std::vector<std::unique_ptr<Password>> &passwords) noexcept
+                                 : path_to_file_with_passwords{path_to_file_with_passwords},
+                                 master_password{master_password} {
     std::ranges::for_each(passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
@@ -69,7 +83,8 @@ PasswordManager::PasswordManager(const std::vector<std::unique_ptr<Password>> &p
     refresh_categories_set();
 }
 
-PasswordManager::PasswordManager(const PasswordManager &pm) noexcept {
+PasswordManager::PasswordManager(const PasswordManager &pm) noexcept
+    : path_to_file_with_passwords{pm.path_to_file_with_passwords}, master_password{pm.master_password} {
     std::ranges::for_each(pm.passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
@@ -77,7 +92,8 @@ PasswordManager::PasswordManager(const PasswordManager &pm) noexcept {
     refresh_categories_set();
 }
 
-PasswordManager::PasswordManager(PasswordManager &&pm) noexcept : passwords {std::move(pm.passwords)} {
+PasswordManager::PasswordManager(PasswordManager &&pm) noexcept : path_to_file_with_passwords{std::move(pm.path_to_file_with_passwords)},
+    master_password{std::move(pm.master_password)}, passwords {std::move(pm.passwords)} {
     refresh_categories_set();
 }
 
@@ -85,6 +101,9 @@ PasswordManager &PasswordManager::operator=(const PasswordManager &pm) {
     if(this == &pm) {
         return *this;
     }
+
+    path_to_file_with_passwords = pm.path_to_file_with_passwords;
+    master_password = pm.master_password;
 
     std::ranges::for_each(pm.passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
@@ -100,8 +119,9 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
         return *this;
     }
 
+    path_to_file_with_passwords = std::move(pm.path_to_file_with_passwords);
+    master_password = std::move(pm.master_password);
     passwords = std::move(pm.passwords);
-
     refresh_categories_set();
 
     return *this;
@@ -339,7 +359,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "6. Remove passwords" << std::endl;
         std::cout << "7. Add category" << std::endl;
         std::cout << "8. Remove category" << std::endl;
-        std::cout << "9. Exit" << std::endl;
+        std::cout << "9. Save changes and exit" << std::endl;
 
         std::cout << "Your choice: ";
         std::cin >> choice; std::cin.get();
@@ -383,6 +403,13 @@ void PasswordManager::menu() noexcept {
                 remove_category_menu();
                 break;
             case 9:
+                FileWriter::save(
+                        path_to_file_with_passwords.replace_filename(fs::path{"saved.txt"}).string(),
+                        generate_decrypted_output_vector()
+                );
+
+                std::cout << "Changes saved successfully!" << std::endl;
+
                 return;
             default:
                 std::cout << "There is no such option! Try again!" << std::endl;

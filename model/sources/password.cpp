@@ -134,6 +134,14 @@ password_strength Password::get_password_strength(const std::string &expression)
     }
 }
 
+std::string Password::get_raw_string(const std::string& separator) const noexcept {
+    return description + separator
+            + password + separator
+            + category + separator
+            + website_address.value_or("-") + separator
+            + login.value_or("-");
+}
+
 std::ostream& operator<<(std::ostream& out, const Password& password) {
     return out << "PASSWORD{ DESCRIPTION: " << password.description << ", PASSWORD: " << password.password
                << ", CATEGORY: " << password.category << ", WEBSITE ADDRESS: " << password.website_address.value_or("-")

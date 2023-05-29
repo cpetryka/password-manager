@@ -36,7 +36,7 @@ int main() {
     });
 
     // Creating a PasswordManager object
-    auto password_manager = PasswordManager {passwords};
+    auto password_manager = PasswordManager {path, "apasswordz", passwords};
     password_manager.menu();
 
     return 0;
