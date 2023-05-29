@@ -13,6 +13,21 @@ std::string Password::get_category() const noexcept {
     return category;
 }
 
+std::string Password::get_field(const password_field &field) const noexcept {
+    switch (field) {
+        case password_field::DESCRIPTION:
+            return description;
+        case password_field::PASSWORD:
+            return password;
+        case password_field::CATEGORY:
+            return category;
+        case password_field::WEBSITE_ADDRESS:
+            return website_address.value_or("");
+        case password_field::LOGIN:
+            return login.value_or("");
+    }
+}
+
 bool Password::is_password_the_same(const std::string &expression) const noexcept {
     return password == expression;
 }

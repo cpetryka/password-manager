@@ -4,7 +4,28 @@
 
 #include "../password_manager.hpp"
 
-std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteria_from_user() noexcept {
+std::vector<password_field> PasswordManager::get_criteria_from_user() noexcept {
+    std::vector<password_field> criteria;
+
+    while(true) {
+        std::cout << "========== CRITERIA CHOOSER ==========" << std::endl;
+        auto choice = PasswordField::choose_field_menu();
+
+        criteria.push_back(choice);
+
+        std::cout << "Do you want to add another criteria? (y/n): ";
+        auto answer = std::string {};
+        std::getline(std::cin, answer);
+
+        if(answer == "n") {
+            break;
+        }
+    }
+
+    return criteria;
+}
+
+std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteria_plus_from_user() noexcept {
     std::vector<std::pair<password_field, std::string>> criteria;
 
     while(true) {
@@ -128,7 +149,7 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
 }
 
 std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept {
-    auto criteria = get_criteria_from_user();
+    auto criteria = get_criteria_plus_from_user();
 
     auto result = std::vector<std::unique_ptr<Password>> {};
 
@@ -148,6 +169,21 @@ std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept
     }
 
     return result;
+}
+
+void PasswordManager::sort_passwords(const std::vector<password_field> &criteria) noexcept {
+    std::ranges::sort(passwords, [&criteria](const auto& lhs, const auto& rhs) {
+        for(const auto& one_criteria : criteria) {
+            const auto lhs_field_value = lhs->get_field(one_criteria);
+            const auto rhs_field_value = rhs->get_field(one_criteria);
+
+            if(lhs_field_value != rhs_field_value) {
+                return lhs_field_value < rhs_field_value;
+            }
+        }
+
+        return false;
+    });
 }
 
 void PasswordManager::add_password_menu() noexcept {
@@ -354,6 +390,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "========== MAIN MENU ==========" << std::endl;
         std::cout << "1. Show all passwords" << std::endl;
         std::cout << "2. Show passwords that match the given criteria" << std::endl;
+        std::cout << "3. Sort passwords" << std::endl;
         std::cout << "4. Add password" << std::endl;
         std::cout << "5. Edit password" << std::endl;
         std::cout << "6. Remove passwords" << std::endl;
@@ -381,6 +418,9 @@ void PasswordManager::menu() noexcept {
                         std::cout << *password << std::endl;
                     });
                 }
+                break;
+            case 3:
+                sort_passwords(PasswordManager::get_criteria_from_user());
                 break;
             case 4:
                 add_password_menu();

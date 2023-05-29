@@ -26,9 +26,15 @@ class PasswordManager {
 
     /**
      * @brief Gets criteria (for sorting, filtering etc.) from user
-     * @return std::vector<std::pair<password_field, std::string>> containing criteria
+     * @return std::vector<password_field> containing criteria
      */
-    static std::vector<std::pair<password_field, std::string>> get_criteria_from_user() noexcept;
+    static std::vector<password_field> get_criteria_from_user() noexcept;
+
+    /**
+     * @brief Gets criteria (for sorting, filtering etc.) and some additional information from user
+     * @return std::vector<std::pair<password_field, std::string>> containing criteria and some additional information
+     */
+    static std::vector<std::pair<password_field, std::string>> get_criteria_plus_from_user() noexcept;
 
     /**
      * @brief Refreshes the set of categories
@@ -74,6 +80,12 @@ public:
      * @return std::vector<std::unique_ptr<Password>> containing passwords that match the given criteria
      */
     std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
+
+    /**
+     * @brief Sorts passwords by given criteria
+     * @param criteria vector of criteria
+     */
+    void sort_passwords(const std::vector<password_field>& criteria) noexcept;
 
     /**
      * @brief Adds a new password

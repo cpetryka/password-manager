@@ -27,6 +27,13 @@ public:
     std::string get_category() const noexcept;
 
     /**
+     * @brief Gets the specified field of the password
+     * @param field
+     * @return the specified field of the password
+     */
+    std::string get_field(const password_field& field) const noexcept;
+
+    /**
      * @brief Checks if the password is the same as the given expression
      * @param expression
      * @return true if the password is the same as the given expression, false otherwise
