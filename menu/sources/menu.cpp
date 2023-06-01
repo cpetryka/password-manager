@@ -33,9 +33,8 @@ fs::path Menu::get_path_to_file_with_passwords_from_user(const fs::path& path_to
                 do_continue = {false};
                 break;
             case 9:
-                fs::path {""};
-                do_continue = {false};
-                break;
+                std::cout << "Exiting..." << std::endl;
+                exit(0);
             default:
                 system("cls");
                 std::cout << "There's no such option. Try again!" << std::endl;
@@ -47,7 +46,7 @@ fs::path Menu::get_path_to_file_with_passwords_from_user(const fs::path& path_to
     return path;
 }
 
-std::vector<std::string> Menu::get_password_and_try_decrypt(const fs::path& path_to_file_with_passwords) {
+std::pair<std::string, std::vector<std::string>> Menu::get_password_and_try_decrypt(const fs::path& path_to_file_with_passwords) {
     // Read file content
     auto encrypted_file_content = FileReader::read(path_to_file_with_passwords);
 
@@ -70,7 +69,7 @@ std::vector<std::string> Menu::get_password_and_try_decrypt(const fs::path& path
 
         // Final actions
         if(decryption_success_test) {
-            return decrypted_content;
+            return std::make_pair(password, decrypted_content);
         }
         else if(attempts < 2) {
             std::cout << "Wrong password! Try again!" << std::endl;
@@ -84,6 +83,7 @@ std::vector<std::string> Menu::get_password_and_try_decrypt(const fs::path& path
     }
 
     // If user has exceeded the number of attempts, return empty vector
+    password.clear();
     decrypted_content.clear();
-    return decrypted_content;
+    return std::make_pair(password, decrypted_content);
 }

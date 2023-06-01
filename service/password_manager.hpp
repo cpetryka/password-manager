@@ -10,9 +10,11 @@
 #include "../model/password_field.hpp"
 #include "../model/password_strength.hpp"
 #include "../validator/password_validator.hpp"
+#include "../parser/password_parser.hpp"
 #include "../file/writer/file_writer.hpp"
 #include "../encription/encryptor.hpp"
 #include "../utilities/utilities.hpp"
+#include "../menu/menu.hpp"
 
 /**
  * @brief Class representing a password manager
@@ -23,6 +25,10 @@ class PasswordManager {
     std::string master_password;
     std::vector<std::unique_ptr<Password>> passwords;
     std::set<std::string> categories;
+
+    // Constants used in this class
+    const fs::path SAVED_PASSWORDS_PATH = fs::path {"saved_passwords"};
+    const std::string SEPARATOR = ";";
 
     /**
      * @brief Gets criteria (for sorting, filtering etc.) from user
@@ -66,8 +72,13 @@ class PasswordManager {
      * @brief Generates a vector of strings that will be saved to the file
      */
     std::vector<std::string> generate_decrypted_output_vector() const noexcept;
+
+    /**
+     * @brief Initializes the PasswordManager object
+     */
+    void init() noexcept;
 public:
-    explicit PasswordManager(const fs::path& path_to_file_with_passwords, const std::string& master_password, const std::vector<std::unique_ptr<Password>>& passwords) noexcept;
+    explicit PasswordManager() noexcept;
 
     PasswordManager(const PasswordManager& pm) noexcept;
     PasswordManager(PasswordManager&& pm) noexcept;

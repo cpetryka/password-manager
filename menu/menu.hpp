@@ -23,7 +23,13 @@ struct Menu {
      * @return std::filesystem::path representing a path to a chosen file
      */
     static fs::path get_path_to_file_with_passwords_from_user(const fs::path& path_to_files_with_saved_passwords);
-    static std::vector<std::string> get_password_and_try_decrypt(const fs::path& path_to_file_with_passwords);
+
+    /**
+     * @brief This method allows user to enter a password and tries to decrypt the file using this password
+     * @param std::filesystem::path representing a path to a file with passwords
+     * @return std::pair<std::string, std::vector<std::string>> containing a password and a vector of passwords
+     */
+    static std::pair<std::string, std::vector<std::string>> get_password_and_try_decrypt(const fs::path& path_to_file_with_passwords);
 };
 
 

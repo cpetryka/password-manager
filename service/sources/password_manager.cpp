@@ -86,21 +86,52 @@ std::vector<std::string> PasswordManager::generate_decrypted_output_vector() con
     auto result = std::vector<std::string> {};
 
     std::ranges::for_each(passwords, [&](const auto& password_ptr) {
-        result.emplace_back(Encryptor::encrypt(password_ptr->get_raw_string(";"), master_password));
+        result.emplace_back(Encryptor::encrypt(password_ptr->get_raw_string(SEPARATOR), master_password));
     });
 
     return result;
 }
 
-PasswordManager::PasswordManager(const fs::path& path_to_file_with_passwords,
-                                 const std::string& master_password,
-                                 const std::vector<std::unique_ptr<Password>> &passwords) noexcept
-                                 : path_to_file_with_passwords{path_to_file_with_passwords},
-                                 master_password{master_password} {
-    std::ranges::for_each(passwords, [this](const auto& password) {
-        this->passwords.emplace_back(std::make_unique<Password>(*password));
-    });
+void PasswordManager::init() noexcept {
+    auto separator = SEPARATOR;
 
+    while(true) {
+        system("cls");
+        std::cout << "Welcome to Password Manager!" << std::endl;
+
+        // User's choice whether to use one of the saved files or to provide his own path
+        this->path_to_file_with_passwords = Menu::get_path_to_file_with_passwords_from_user(SAVED_PASSWORDS_PATH);
+
+        if(this->path_to_file_with_passwords.empty()) {
+            system("cls");
+            std::cout << "Something went wrong. Try again!" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+
+        // Decryption of the file
+        auto pair = Menu::get_password_and_try_decrypt(this->path_to_file_with_passwords);
+
+        if(pair.second.empty()) {
+            system("cls");
+            std::cout << "Something went wrong. Try again!" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+
+        // If the decryption was successful, then we can assign the master password and the passwords vector and break the loop
+        this->master_password = pair.first;
+
+        std::ranges::transform(pair.second, std::back_inserter(this->passwords), [&separator](const auto& line) {
+            return std::make_unique<Password>(PasswordParser::parse(line, separator));
+        });
+
+        break;
+    }
+}
+
+PasswordManager::PasswordManager() noexcept {
+    init();
     refresh_categories_set();
 }
 
@@ -444,12 +475,11 @@ void PasswordManager::menu() noexcept {
                 break;
             case 9:
                 FileWriter::save(
-                        path_to_file_with_passwords.replace_filename(fs::path{"saved.txt"}),
+                        path_to_file_with_passwords,
                         generate_decrypted_output_vector()
                 );
 
                 std::cout << "Changes saved successfully!" << std::endl;
-
                 return;
             default:
                 std::cout << "There is no such option! Try again!" << std::endl;
