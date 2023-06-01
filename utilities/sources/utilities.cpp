@@ -84,7 +84,7 @@ std::string Utilities::get_current_date_and_time_as_raw_string() {
        << Utilities::add_front_zeros(static_cast<unsigned>(ymd.day()), 2)
        << Utilities::add_front_zeros(hms.hours().count() + 2, 2)
        << Utilities::add_front_zeros(hms.minutes().count() , 2)
-       << Utilities::add_front_zeros(hms.seconds().count() , 2);
+       << Utilities::add_front_zeros(hms.seconds().count() , 2) << "00";
 
     return ss.str();
 }
@@ -97,6 +97,7 @@ std::string Utilities::convert_raw_date_string_to_standard_format(const std::str
     result.insert(10, " ");
     result.insert(13, ":");
     result.insert(16, ":");
+    result.erase(result.size() - 2);
 
     return result;
 }

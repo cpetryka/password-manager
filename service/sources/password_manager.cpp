@@ -83,7 +83,7 @@ bool PasswordManager::check_if_password_has_already_been_used(const std::string&
     });
 }
 
-std::vector<std::string> PasswordManager::generate_decrypted_output_vector() const noexcept {
+std::vector<std::string> PasswordManager::generate_encrypted_output_vector() const noexcept {
     auto result = std::vector<std::string> {};
 
     std::ranges::for_each(passwords, [&](const auto& password_ptr) {
@@ -93,6 +93,136 @@ std::vector<std::string> PasswordManager::generate_decrypted_output_vector() con
     return result;
 }
 
+std::vector<std::string> PasswordManager::add_timestamp_to_vector(const std::vector<std::string>& vector) const noexcept {
+    auto result = std::vector<std::string> {vector};
+    auto timestamp_copy = last_decryption_timestamp;
+
+    // If there is fewer than 8 elements in the vector, then we need to add empty strings to the vector
+    while(result.size() < 8) {
+        result.emplace_back("");
+    }
+
+    // Add the timestamp to the vector
+    for(auto i = 1; i < 8; i += 2) {
+        result.at(i) = timestamp_copy.substr(0, 4) + result.at(i);
+        // result.emplace(result.begin() + i, timestamp_copy.substr(0, 4) + result.at(i));
+        timestamp_copy = timestamp_copy.substr(4);
+    }
+
+    return result;
+}
+
+std::string PasswordManager::get_and_remove_timestamp_from_vector(std::vector<std::string>& vector) noexcept {
+    auto timestamp_temp = std::string {};
+
+    for(auto i = 1; i < 8; i += 2) {
+        timestamp_temp += vector.at(i).substr(0, 4);
+        vector.at(i) = vector.at(i).substr(4);
+    }
+
+    return timestamp_temp;
+}
+
+fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
+    auto path = fs::path {};
+    auto do_continue {true};
+    auto choice {0};
+
+    while(do_continue) {
+        // Print menu
+        std::cout << "Decide whether you want to use one of the saved files with passwords or if you want to provide your own path." << std::endl;
+        std::cout << "============ MAIN MENU ============" << std::endl;
+        std::cout << "1 -> use one of the saved files" << std::endl;
+        std::cout << "2 -> provide your own path" << std::endl;
+        std::cout << "9 -> exit" << std::endl;
+
+        // Get user's choice
+        std::cout << "Your choice: ";
+        std::cin >> choice; std::cin.get();
+
+        // Perform action based on user's choice
+        system("cls");
+        switch(choice) {
+            case 1:
+                path = FileManager::select_file_from_directory_by_user(SAVED_PASSWORDS_PATH);
+                do_continue = {false};
+                break;
+            case 2:
+                path = FileManager::get_path_to_file_from_user();
+                do_continue = {false};
+                break;
+            case 9:
+                std::cout << "Exiting..." << std::endl;
+                exit(0);
+            default:
+                system("cls");
+                std::cout << "There's no such option. Try again!" << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                system("cls");
+        }
+    }
+
+    return path;
+}
+
+std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_and_try_decrypt() {
+    // Read file content
+    auto encrypted_file_content = FileReader::read(path_to_file_with_passwords);
+
+    // Get timestamp from the file content, remove it from the vector and print it
+    auto ldt = get_and_remove_timestamp_from_vector(encrypted_file_content);
+    std::cout << "Last file decryption time: " << Utilities::convert_raw_date_string_to_standard_format(ldt) << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    auto attempts {0};
+    auto password = std::string {};
+    auto decrypted_content = std::vector<std::string> {};
+
+    while(true) {
+        // Get password from user
+        std::cout << "Enter your password: ";
+        std::getline(std::cin, password);
+
+        // Decrypt file content
+        decrypted_content = Encryptor::decrypt_all(encrypted_file_content, password);
+        last_decryption_timestamp = Utilities::get_current_date_and_time_as_raw_string();
+
+        // Add timestamp to the vector and save it to the file
+        auto vector_with_timestamp = add_timestamp_to_vector(encrypted_file_content);
+
+        FileWriter::save(
+                path_to_file_with_passwords,
+                vector_with_timestamp
+        );
+
+        // Validate decrypted content
+        auto decryption_success_test = std::ranges::all_of(decrypted_content, [](const auto& line) {
+            return PasswordValidator::validate(line) || line.empty();
+        });
+
+        // Final actions
+        if(decryption_success_test) {
+            system("cls");
+            return std::make_pair(password, decrypted_content);
+        }
+        else if(attempts < 2) {
+            std::cout << "Wrong password! Try again!" << std::endl;
+        }
+        else {
+            std::cout << "You've exceeded the number of attempts!" << std::endl;
+            break;
+        }
+
+        attempts++;
+    }
+
+    // If user has exceeded the number of attempts, return empty vector
+    password.clear();
+    decrypted_content.clear();
+    return std::make_pair(password, decrypted_content);
+}
+
+
 void PasswordManager::init() noexcept {
     auto separator = SEPARATOR;
 
@@ -101,7 +231,7 @@ void PasswordManager::init() noexcept {
         std::cout << "Welcome to Password Manager!" << std::endl;
 
         // User's choice whether to use one of the saved files or to provide his own path
-        this->path_to_file_with_passwords = Menu::get_path_to_file_with_passwords_from_user(SAVED_PASSWORDS_PATH);
+        this->path_to_file_with_passwords = get_path_to_file_with_passwords_from_user();
 
         if(this->path_to_file_with_passwords.empty()) {
             system("cls");
@@ -111,7 +241,8 @@ void PasswordManager::init() noexcept {
         }
 
         // Decryption of the file
-        auto pair = Menu::get_password_and_try_decrypt(this->path_to_file_with_passwords);
+        auto pair = get_password_and_try_decrypt();
+        last_decryption_timestamp = Utilities::get_current_date_and_time_as_raw_string();
 
         if(pair.second.empty()) {
             system("cls");
@@ -137,7 +268,8 @@ PasswordManager::PasswordManager() noexcept {
 }
 
 PasswordManager::PasswordManager(const PasswordManager &pm) noexcept
-    : path_to_file_with_passwords{pm.path_to_file_with_passwords}, master_password{pm.master_password} {
+    : path_to_file_with_passwords{pm.path_to_file_with_passwords}, master_password{pm.master_password},
+    last_decryption_timestamp{pm.last_decryption_timestamp} {
     std::ranges::for_each(pm.passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
     });
@@ -145,8 +277,9 @@ PasswordManager::PasswordManager(const PasswordManager &pm) noexcept
     refresh_categories_set();
 }
 
-PasswordManager::PasswordManager(PasswordManager &&pm) noexcept : path_to_file_with_passwords{std::move(pm.path_to_file_with_passwords)},
-    master_password{std::move(pm.master_password)}, passwords {std::move(pm.passwords)} {
+PasswordManager::PasswordManager(PasswordManager &&pm) noexcept
+    : path_to_file_with_passwords{std::move(pm.path_to_file_with_passwords)}, master_password{std::move(pm.master_password)},
+    last_decryption_timestamp{std::move(pm.last_decryption_timestamp)}, passwords{std::move(pm.passwords)} {
     refresh_categories_set();
 }
 
@@ -157,6 +290,7 @@ PasswordManager &PasswordManager::operator=(const PasswordManager &pm) {
 
     path_to_file_with_passwords = pm.path_to_file_with_passwords;
     master_password = pm.master_password;
+    last_decryption_timestamp = pm.last_decryption_timestamp;
 
     std::ranges::for_each(pm.passwords, [this](const auto& password) {
         this->passwords.emplace_back(std::make_unique<Password>(*password));
@@ -174,6 +308,7 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
 
     path_to_file_with_passwords = std::move(pm.path_to_file_with_passwords);
     master_password = std::move(pm.master_password);
+    last_decryption_timestamp = std::move(pm.last_decryption_timestamp);
     passwords = std::move(pm.passwords);
     refresh_categories_set();
 
@@ -486,7 +621,7 @@ void PasswordManager::menu() noexcept {
             case 9:
                 FileWriter::save(
                         path_to_file_with_passwords,
-                        generate_decrypted_output_vector()
+                        add_timestamp_to_vector(generate_encrypted_output_vector())
                 );
 
                 std::cout << "Changes saved successfully!" << std::endl;

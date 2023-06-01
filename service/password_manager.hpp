@@ -14,7 +14,8 @@
 #include "../file/writer/file_writer.hpp"
 #include "../encription/encryptor.hpp"
 #include "../utilities/utilities.hpp"
-#include "../menu/menu.hpp"
+#include "../file/manager/file_manager.hpp"
+#include "../file/reader/file_reader.hpp"
 
 /**
  * @brief Class representing a password manager
@@ -23,6 +24,7 @@
 class PasswordManager {
     fs::path path_to_file_with_passwords;
     std::string master_password;
+    std::string last_decryption_timestamp;
     std::vector<std::unique_ptr<Password>> passwords;
     std::set<std::string> categories;
 
@@ -71,7 +73,35 @@ class PasswordManager {
     /**
      * @brief Generates a vector of strings that will be saved to the file
      */
-    std::vector<std::string> generate_decrypted_output_vector() const noexcept;
+    std::vector<std::string> generate_encrypted_output_vector() const noexcept;
+
+    /**
+     * @brief Adds timestamp to the given vector
+     * @param std::vector<std::string> containing elements
+     * @return std::vector<std::string> containing elements with timestamp
+     * @details The timestamp is at the beginning of the second, fourth, sixth and eight element
+     */
+    std::vector<std::string> add_timestamp_to_vector(const std::vector<std::string>& vector) const noexcept;
+
+    /**
+     * @brief Gets and removes timestamp from the given vector
+     * @param std::vector<std::string> containing elements with timestamp
+     * @return std::string containing timestamp
+     */
+    std::string get_and_remove_timestamp_from_vector(std::vector<std::string>& vector) noexcept;
+
+    /**
+     * @brief This method allows user to choose whether to use one of the saved files or to provide their own path
+     * @return std::filesystem::path representing a path to a chosen file
+     */
+    fs::path get_path_to_file_with_passwords_from_user();
+
+    /**
+     * @brief This method allows user to enter a password and tries to decrypt the file using this password
+     * @param std::filesystem::path representing a path to a file with passwords
+     * @return std::pair<std::string, std::vector<std::string>> containing a password and a vector of passwords
+     */
+    std::pair<std::string, std::vector<std::string>> get_password_and_try_decrypt();
 
     /**
      * @brief Initializes the PasswordManager object
