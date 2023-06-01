@@ -31,7 +31,7 @@ struct Utilities {
 
     /**
      * @brief Converts expression to lowercase
-     * @param expression
+     * @param std::string representing some expression
      * @return std::string containing expression in lowercase
      */
     static std::string to_lowercase(const std::string& expression);
@@ -58,6 +58,28 @@ struct Utilities {
      * @return true if user answered yes, false otherwise
      */
     static bool get_yes_or_no_from_user(const std::string& message);
+
+    /**
+     * @brief Adds front zeros to number
+     * @param number
+     * @param full_length
+     * @return std::string containing number with front zeros
+     */
+    static std::string add_front_zeros(int number, const int full_length);
+
+    /**
+     * @brief Gets current date and time as string
+     * @return std::string containing current date and time
+     * @details Format: YYYYMMDDHHMMSS
+     */
+    static std::string get_current_date_and_time_as_raw_string();
+
+    /**
+     * @brief Converts raw date string to standard format
+     * @param std::string containing raw date string
+     * @return std::string containing date in standard format (YYYY-MM-DD HH:MM:SS)
+     */
+    static std::string convert_raw_date_string_to_standard_format(const std::string& raw_date_string);
 };
 
 

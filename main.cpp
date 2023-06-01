@@ -1,5 +1,6 @@
 #include "model/password.hpp"
 #include "service/password_manager.hpp"
+#include <chrono>
 
 int main() {
     srand(time(nullptr));
