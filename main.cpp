@@ -16,7 +16,6 @@ int main() {
     const auto SEPARATOR = std::string {";"};
 
     std::cout << "Welcome to Password Manager!" << std::endl;
-    std::cout << "Decide whether you want to use one of the saved files with passwords or if you want to provide your own path." << std::endl;
 
     // User's choice whether to use one of the saved files or to provide his own path
     auto path = Menu::get_path_to_file_with_passwords_from_user(SAVED_PASSWORDS_PATH);
@@ -27,7 +26,12 @@ int main() {
     }
 
     // Decryption of the file
-    auto decrypted_content = Menu::get_password_and_decrypt(path);
+    auto decrypted_content = Menu::get_password_and_try_decrypt(path);
+
+    if(decrypted_content.empty()) {
+        std::cout << "Exiting..." << std::endl;
+        return 0;
+    }
 
     std::vector<std::unique_ptr<Password>> passwords;
 

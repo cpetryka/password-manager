@@ -23,7 +23,7 @@ struct Menu {
      * @return std::filesystem::path representing a path to a chosen file
      */
     static fs::path get_path_to_file_with_passwords_from_user(const fs::path& path_to_files_with_saved_passwords);
-    static std::vector<std::string> get_password_and_decrypt(const fs::path& path_to_file_with_passwords);
+    static std::vector<std::string> get_password_and_try_decrypt(const fs::path& path_to_file_with_passwords);
 };
 
 

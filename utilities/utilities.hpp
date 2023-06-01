@@ -51,6 +51,13 @@ struct Utilities {
      * @return true if expression contains substring, false otherwise
      */
     static bool contains_case_insensitive(const std::string& expression, const std::string& substring);
+
+    /**
+     * @brief Prints message, asks user yes or no question and returns the answer as bool
+     * @param message
+     * @return true if user answered yes, false otherwise
+     */
+    static bool get_yes_or_no_from_user(const std::string& message);
 };
 
 

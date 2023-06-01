@@ -15,15 +15,15 @@ struct FileWriter {
     /**
      * @brief Saves data to file
      * @tparam T representing the type of data to save
-     * @param std::string representing a path to a file
+     * @param std::filesystem::path representing a path to a file
      * @param std::vector<T> representing data to save
      */
     template<typename T>
-    static void save(const std::string& path, const std::vector<T>& data) {
+    static void save(const fs::path& path, const std::vector<T>& data) {
         std::ofstream out { path };
 
         if(!out.is_open()) {
-            throw FileWriterException("FileWriter::save: file " + path + " cannot be opened");
+            throw FileWriterException("FileWriter::save: file " + path.string() + " cannot be opened");
         }
 
         std::ranges::for_each(data, [&out](const auto& password) {

@@ -6,6 +6,7 @@
 #define PASSWORD_MANAGER_FILE_MANAGER_HPP
 
 #include "../../libs/libs.hpp"
+#include "../../utilities/utilities.hpp"
 
 /**
  * @brief Class with some useful methods to manage files
@@ -18,26 +19,28 @@ struct FileManager {
      * @param std::string representing a path to a file
      * @return true if file exists, false otherwise
      */
-    static bool check_if_file_exists(const fs::path& path) {
-        return is_regular_file(fs::path(path));
-    }
+    static bool check_if_file_exists(const fs::path& path);
 
     /**
      * @brief Gets all files from directory
      * @param std::filesystem::path representing a path to a directory
      * @return std::vector<std::filesystem::path> containing all files from a specified directory
      */
-    static std::vector<fs::path> get_all_files_from_directory(const fs::path& path) {
-        std::vector<fs::path> result;
+    static std::vector<fs::path> get_all_files_from_directory(const fs::path& path);
 
-        for(const auto& entry : fs::directory_iterator(path)) {
-            if(entry.is_regular_file()) {
-                result.emplace_back(entry.path());
-            }
-        }
+    /**
+     * @brief Gets a path to a file from user
+     * @return std::filesystem::path representing a path to a file
+     * @details The method checks if the file exists. If not, the user is asked if he/she wants to try again.
+     */
+    static fs::path get_path_to_file_from_user();
 
-        return result;
-    }
+    /**
+     * @brief Lets user choose a file from a specified directory
+     * @param path_to_directory std::filesystem::path representing a path to a directory
+     * @return std::filesystem::path representing a path to a file
+     */
+    static fs::path select_file_from_directory_by_user(const fs::path& path_to_directory);
 };
 
 #endif //PASSWORD_MANAGER_FILE_MANAGER_HPP

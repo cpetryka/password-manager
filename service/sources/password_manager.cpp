@@ -444,7 +444,7 @@ void PasswordManager::menu() noexcept {
                 break;
             case 9:
                 FileWriter::save(
-                        path_to_file_with_passwords.replace_filename(fs::path{"saved.txt"}).string(),
+                        path_to_file_with_passwords.replace_filename(fs::path{"saved.txt"}),
                         generate_decrypted_output_vector()
                 );
 

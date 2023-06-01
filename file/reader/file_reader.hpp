@@ -14,14 +14,14 @@
 struct FileReader {
     /**
      * @brief Reads data from file
-     * @param std::string representing a path to a file
+     * @param std::filesystem::path representing a path to a file
      * @return std::vector<std::string> containing data from file
      */
-    static std::vector<std::string> read(const std::string& path) {
+    static std::vector<std::string> read(const fs::path& path) {
         std::ifstream in { path };
 
         if(!in.is_open()) {
-            throw FileReaderException("FileReader::read: file " + path + " cannot be opened");
+            throw FileReaderException("FileReader::read: file " + path.string() + " cannot be opened");
         }
 
         std::vector<std::string> result;
