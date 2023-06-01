@@ -29,6 +29,7 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteri
     std::vector<std::pair<password_field, std::string>> criteria;
 
     while(true) {
+        system("cls");
         std::cout << "========== CRITERIA CHOOSER ==========" << std::endl;
         auto choice = PasswordField::choose_field_menu();
 
@@ -432,6 +433,7 @@ void PasswordManager::menu() noexcept {
         std::cout << "Your choice: ";
         std::cin >> choice; std::cin.get();
 
+        system("cls");
         switch(choice) {
             case 1:
                 std::cout << "========== PASSWORDS ==========" << std::endl;
@@ -444,7 +446,14 @@ void PasswordManager::menu() noexcept {
                 {
                     auto criteria_passwords = get_passwords();
 
+                    system("cls");
                     std::cout << "========== PASSWORDS ==========" << std::endl;
+
+                    if(criteria_passwords.empty()) {
+                        std::cout << "No passwords match the given criteria!" << std::endl;
+                        break;
+                    }
+
                     std::ranges::for_each(criteria_passwords, [](const auto& password) {
                         std::cout << *password << std::endl;
                     });
@@ -452,6 +461,7 @@ void PasswordManager::menu() noexcept {
                 break;
             case 3:
                 sort_passwords(PasswordManager::get_criteria_from_user());
+                std::cout << "The passwords have been sorted successfully!" << std::endl;
                 break;
             case 4:
                 add_password_menu();

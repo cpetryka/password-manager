@@ -63,15 +63,19 @@ namespace PasswordField {
      * @return Chosen "field"
      */
     static Type choose_field_menu() {
-        std::cout << "Choose one of the following fields:" << std::endl;
-
-        for(int i = 0; i < SIZE; i++) {
-            std::cout << i + 1 << ". " << to_string(at_idx(i)) << std::endl;
-        }
-
-        std::cout << "Your choice: ";
         auto choice {-1};
-        std::cin >> choice; std::cin.get();
+
+        do {
+            std::cout << "Choose one of the following fields:" << std::endl;
+
+            for(int i = 0; i < SIZE; i++) {
+                std::cout << i + 1 << ". " << to_string(at_idx(i)) << std::endl;
+            }
+
+            std::cout << "Your choice: ";
+
+            std::cin >> choice; std::cin.get();
+        } while(choice < 1 || choice > SIZE);
 
         return at_idx(choice - 1);
     }

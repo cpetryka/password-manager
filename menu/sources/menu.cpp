@@ -69,6 +69,7 @@ std::pair<std::string, std::vector<std::string>> Menu::get_password_and_try_decr
 
         // Final actions
         if(decryption_success_test) {
+            system("cls");
             return std::make_pair(password, decrypted_content);
         }
         else if(attempts < 2) {
