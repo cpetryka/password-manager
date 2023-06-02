@@ -8,6 +8,7 @@ std::vector<password_field> PasswordManager::get_criteria_from_user() noexcept {
     std::vector<password_field> criteria;
 
     while(true) {
+        system("cls");
         std::cout << "========== CRITERIA CHOOSER ==========" << std::endl;
         auto choice = PasswordField::choose_field_menu();
 
@@ -115,9 +116,14 @@ std::vector<std::string> PasswordManager::add_timestamp_to_vector(const std::vec
 std::string PasswordManager::get_and_remove_timestamp_from_vector(std::vector<std::string>& vector) noexcept {
     auto timestamp_temp = std::string {};
 
-    for(auto i = 1; i < 8; i += 2) {
+    for(auto i = 1; i <= 7; i += 2) {
         timestamp_temp += vector.at(i).substr(0, 4);
-        vector.at(i) = vector.at(i).substr(4);
+
+        if(vector.at(i).size() > 4) {
+            vector.at(i) = vector.at(i).substr(4);
+        } else {
+            vector.at(i) = "";
+        }
     }
 
     return timestamp_temp;
@@ -132,8 +138,9 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
         // Print menu
         std::cout << "Decide whether you want to use one of the saved files with passwords or if you want to provide your own path." << std::endl;
         std::cout << "============ MAIN MENU ============" << std::endl;
-        std::cout << "1 -> use one of the saved files" << std::endl;
-        std::cout << "2 -> provide your own path" << std::endl;
+        std::cout << "1 -> create new file" << std::endl;
+        std::cout << "2 -> use one of the saved files" << std::endl;
+        std::cout << "3 -> provide your own path" << std::endl;
         std::cout << "9 -> exit" << std::endl;
 
         // Get user's choice
@@ -144,10 +151,32 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
         system("cls");
         switch(choice) {
             case 1:
+                {
+                    while(true) {
+                        std::cout << "Enter the name of the file: ";
+                        auto file_name = std::string {};
+                        std::getline(std::cin, file_name);
+
+                        path = SAVED_PASSWORDS_PATH / (file_name + ".txt");
+
+                        if (FileManager::check_if_file_exists(path)) {
+                            std::cout << "File with this name already exists. Try again!" << std::endl;
+                            std::this_thread::sleep_for(std::chrono::seconds(1));
+                            system("cls");
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    do_continue = {false};
+                    break;
+                }
+            case 2:
                 path = FileManager::select_file_from_directory_by_user(SAVED_PASSWORDS_PATH);
                 do_continue = {false};
                 break;
-            case 2:
+            case 3:
                 path = FileManager::get_path_to_file_from_user();
                 do_continue = {false};
                 break;
@@ -166,13 +195,17 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
 }
 
 std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_and_try_decrypt() {
-    // Read file content
-    auto encrypted_file_content = FileReader::read(path_to_file_with_passwords);
+    auto encrypted_file_content = std::vector<std::string> {8};
 
-    // Get timestamp from the file content, remove it from the vector and print it
-    auto ldt = get_and_remove_timestamp_from_vector(encrypted_file_content);
-    std::cout << "Last file decryption time: " << Utilities::convert_raw_date_string_to_standard_format(ldt) << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    if(FileManager::check_if_file_exists(path_to_file_with_passwords)) {
+        // Read file content
+        encrypted_file_content = FileReader::read(path_to_file_with_passwords);
+
+        // Get timestamp from the file content, remove it from the vector and print it
+        auto ldt = get_and_remove_timestamp_from_vector(encrypted_file_content);
+        std::cout << "Last file decryption time: " << Utilities::convert_raw_date_string_to_standard_format(ldt) << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     auto attempts {0};
     auto password = std::string {};
@@ -254,9 +287,16 @@ void PasswordManager::init() noexcept {
         // If the decryption was successful, then we can assign the master password and the passwords vector and break the loop
         this->master_password = pair.first;
 
-        std::ranges::transform(pair.second, std::back_inserter(this->passwords), [&separator](const auto& line) {
-            return std::make_unique<Password>(PasswordParser::parse(line, separator));
+        auto to_erase = std::ranges::remove_if(pair.second.begin(), pair.second.end(), [](const auto& line) {
+            return line.empty();
         });
+        pair.second.erase(to_erase.begin(), to_erase.end());
+
+        if(!pair.second.empty()) {
+            std::ranges::transform(pair.second, std::back_inserter(this->passwords), [&separator](const auto& line) {
+                return std::make_unique<Password>(PasswordParser::parse(line, separator));
+            });
+        }
 
         break;
     }
@@ -443,7 +483,7 @@ void PasswordManager::edit_password_menu() noexcept {
     auto user_choice {-1};
     std::cin >> user_choice; std::cin.get();
 
-    if(user_choice == 0) {
+    if(user_choice < 1 || user_choice > passwords.size()) {
         return;
     }
     std::cout << "========== EDITING PASSWORD ==========" << std::endl;
@@ -497,6 +537,13 @@ void PasswordManager::remove_passwords_menu() {
     std::ranges::transform(passwords_to_remove, passwords_to_remove.begin(), [](const auto& number) {
         return number - 1;
     });
+
+    auto to_erase = std::ranges::remove_if(passwords_to_remove, [this](const auto& number) {
+        return number < 0 || number >= passwords.size();
+    });
+    passwords_to_remove.erase(to_erase.begin(), to_erase.end());
+
+    std::ranges::sort(passwords_to_remove);
 
     remove_passwords_at_indexes(passwords_to_remove);
 
@@ -571,7 +618,14 @@ void PasswordManager::menu() noexcept {
         system("cls");
         switch(choice) {
             case 1:
+                system("cls");
                 std::cout << "========== PASSWORDS ==========" << std::endl;
+
+                if(passwords.empty()) {
+                    std::cout << "No passwords to show!" << std::endl;
+                    break;
+                }
+
                 std::ranges::for_each(passwords, [](const auto& password) {
                     std::cout << *password << std::endl;
                 });
@@ -610,10 +664,14 @@ void PasswordManager::menu() noexcept {
             case 7:
                 add_category_menu();
 
+                system("cls");
                 std::cout << "The categories are now: " << std::endl;
                 std::ranges::for_each(categories, [](const auto& category) {
-                    std::cout << category << std::endl;
+                    std::cout << "-> " << category << std::endl;
                 });
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                system("cls");
+
                 break;
             case 8:
                 remove_category_menu();

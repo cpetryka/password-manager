@@ -66,6 +66,7 @@ namespace PasswordField {
         auto choice {-1};
 
         do {
+            system("cls");
             std::cout << "Choose one of the following fields:" << std::endl;
 
             for(int i = 0; i < SIZE; i++) {

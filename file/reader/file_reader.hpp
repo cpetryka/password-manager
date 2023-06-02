@@ -30,10 +30,6 @@ struct FileReader {
         while(!in.eof()) {
             std::getline(in, line);
 
-            if(line.empty()) {
-                continue;
-            }
-
             result.emplace_back(line);
         }
 
