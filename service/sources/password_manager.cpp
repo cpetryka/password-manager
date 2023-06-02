@@ -665,11 +665,8 @@ void PasswordManager::menu() noexcept {
                 add_category_menu();
 
                 system("cls");
-                std::cout << "The categories are now: " << std::endl;
-                std::ranges::for_each(categories, [](const auto& category) {
-                    std::cout << "-> " << category << std::endl;
-                });
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                std::cout << "The categories are now: " << get_categories_string() << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
                 system("cls");
 
                 break;
