@@ -29,9 +29,10 @@ struct FileReader {
 
         while(!in.eof()) {
             std::getline(in, line);
-
             result.emplace_back(line);
         }
+
+        in.close();
 
         return result;
     }

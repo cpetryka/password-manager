@@ -29,6 +29,8 @@ struct FileWriter {
         std::ranges::for_each(data, [&out](const auto& password) {
             out << password << std::endl;
         });
+
+        out.close();
     }
 };
 
