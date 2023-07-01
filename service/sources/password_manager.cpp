@@ -62,7 +62,7 @@ void PasswordManager::refresh_categories_set() noexcept {
 }
 
 bool PasswordManager::do_category_exists(const std::string &category) const noexcept {
-    return categories.contains(category);
+    return categories.contains(Utilities::to_lowercase(category));
 }
 
 std::string PasswordManager::get_categories_string() const noexcept {
@@ -566,7 +566,7 @@ void PasswordManager::add_category_menu() noexcept {
     auto category_name = std::string();
     std::getline(std::cin, category_name);
 
-    if(categories.contains(category_name)) {
+    if(do_category_exists(category_name)) {
         std::cout << "Category with this name already exists!" << std::endl;
         return;
     }
@@ -581,7 +581,7 @@ void PasswordManager::remove_category_menu() noexcept {
     auto category_name = std::string();
     std::getline(std::cin, category_name);
 
-    if(!categories.contains(Utilities::to_lowercase(category_name))) {
+    if(!do_category_exists(category_name)) {
         std::cout << "Category with this name does not exist!" << std::endl;
         return;
     }
