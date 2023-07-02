@@ -21,7 +21,7 @@ struct PasswordValidator {
     }
 
     /**
-     * @brief Checks if expression passed as an argument is a valid password
+     * @brief Checks if expression passed as an argument is a valid password (not all password-related information, but strictly the password to some service)
      * @param std::string representing password
      * @return true if expression is a valid password, false otherwise
      */
