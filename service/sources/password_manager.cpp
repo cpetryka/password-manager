@@ -80,7 +80,7 @@ std::string PasswordManager::get_categories_string() const noexcept {
 
 bool PasswordManager::check_if_password_has_already_been_used(const std::string& password) const noexcept {
     return std::ranges::any_of(passwords, [&password](const auto& password_ptr) {
-        return password_ptr->is_password_the_same(password);
+        return password_ptr->compare_field_with(password_field::PASSWORD, password);
     });
 }
 
@@ -364,7 +364,7 @@ std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept
         auto is_password_meeting_criteria = true;
 
         for(const auto& [field, additional_info] : criteria) {
-            if(!password->check_match(field, additional_info)) {
+            if(!password->compare_field_with(field, additional_info)) {
                 is_password_meeting_criteria = false;
                 break;
             }
@@ -413,7 +413,8 @@ void PasswordManager::add_password_menu() noexcept {
             std::cout << "Provide password: ";
             std::getline(std::cin, password);
 
-            std::cout << "The strength of the password is: " << PasswordStrength::to_string(Password::get_password_strength(password)) << std::endl;
+            std::cout << "The strength of the password is: " << PasswordStrength::to_string(
+                    Password::check_password_strength(password)) << std::endl;
 
             if(check_if_password_has_already_been_used(password)) {
                 std::cout << "WARNING! This password has already been used!" << std::endl;

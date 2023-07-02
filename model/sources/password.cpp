@@ -24,11 +24,7 @@ std::string Password::get_field(const password_field &field) const noexcept {
     }
 }
 
-bool Password::is_password_the_same(const std::string &expression) const noexcept {
-    return password == expression;
-}
-
-bool Password::check_match(const password_field &field, const std::string &value) const noexcept {
+bool Password::compare_field_with(const password_field &field, const std::string &value) const noexcept {
     if(field == password_field::DESCRIPTION) {
         return Utilities::contains_case_insensitive(description, value);
     }
@@ -76,34 +72,15 @@ bool Password::edit_password(const password_field &field, const std::string &new
     return true;
 }
 
-std::string Password::generate_password(const int length, const bool upper_and_lowercase, const bool special_characters) noexcept {
-    // Create a string containing all the valid characters
-    auto lowercase_letters = std::string("abcdefghijklmnopqrstuvwxyz");
-    auto uppercase_letters = std::string("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    auto numbers = std::string("0123456789");
-    auto special_chars = std::string("!@#$%^&*");
-
-    auto valid_chars = lowercase_letters + numbers;
-
-    if(upper_and_lowercase) {
-        valid_chars += uppercase_letters;
-    }
-
-    if(special_characters) {
-        valid_chars += numbers + special_chars;
-    }
-
-    // Generate a random password
-    std::string password;
-
-    for(int i = 0; i < length; i++) {
-        password += valid_chars[rand() % valid_chars.size()];
-    }
-
-    return password;
+std::string Password::get_raw_string(const std::string& separator) const noexcept {
+    return description + separator
+           + password + separator
+           + category + separator
+           + website_address.value_or("-") + separator
+           + login.value_or("-");
 }
 
-password_strength Password::get_password_strength(const std::string &expression) noexcept {
+password_strength Password::check_password_strength(const std::string &expression) noexcept {
     auto score {0};
 
     if(expression.size() < 8) {
@@ -145,12 +122,31 @@ password_strength Password::get_password_strength(const std::string &expression)
     }
 }
 
-std::string Password::get_raw_string(const std::string& separator) const noexcept {
-    return description + separator
-            + password + separator
-            + category + separator
-            + website_address.value_or("-") + separator
-            + login.value_or("-");
+std::string Password::generate_password(const int length, const bool upper_and_lowercase, const bool special_characters) noexcept {
+    // Create a string containing all the valid characters
+    auto lowercase_letters = std::string("abcdefghijklmnopqrstuvwxyz");
+    auto uppercase_letters = std::string("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    auto numbers = std::string("0123456789");
+    auto special_chars = std::string("!@#$%^&*");
+
+    auto valid_chars = lowercase_letters + numbers;
+
+    if(upper_and_lowercase) {
+        valid_chars += uppercase_letters;
+    }
+
+    if(special_characters) {
+        valid_chars += numbers + special_chars;
+    }
+
+    // Generate a random password
+    std::string password;
+
+    for(int i = 0; i < length; i++) {
+        password += valid_chars[rand() % valid_chars.size()];
+    }
+
+    return password;
 }
 
 std::ostream& operator<<(std::ostream& out, const Password& password) {
