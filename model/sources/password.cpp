@@ -9,10 +9,6 @@ Password::Password(const std::string& name, const std::string& password, const s
                    : description(name), password(password), category(category), website_address(websiteAddress),
                    login(login) {}
 
-std::string Password::get_category() const noexcept {
-    return category;
-}
-
 std::string Password::get_field(const password_field &field) const noexcept {
     switch (field) {
         case password_field::DESCRIPTION:

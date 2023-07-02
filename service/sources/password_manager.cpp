@@ -57,7 +57,7 @@ void PasswordManager::refresh_categories_set() noexcept {
     categories.clear();
 
     for (const auto& password_ptr : passwords) {
-        categories.emplace(Utilities::to_lowercase(password_ptr->get_category()));
+        categories.emplace(Utilities::to_lowercase(password_ptr->get_field(password_field::CATEGORY)));
     }
 }
 
@@ -591,7 +591,7 @@ void PasswordManager::remove_category_menu() noexcept {
 
     // Remove all passwords that were in this category
     auto to_erase = std::ranges::remove_if(passwords, [&category_name](const auto& password) {
-        return password->get_category() == category_name;
+        return password->get_field(password_field::CATEGORY) == category_name;
     });
 
     passwords.erase(to_erase.begin(), to_erase.end());
