@@ -203,7 +203,7 @@ std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_a
 
         // Get timestamp from the file content, remove it from the vector and print it
         auto ldt = get_and_remove_timestamp_from_vector(encrypted_file_content);
-        std::cout << "Last file decryption time: " << Utilities::convert_raw_date_string_to_standard_format(ldt) << std::endl;
+        std::cout << "Last file decryption time: " << DateTimeUtilities::convert_raw_date_string_to_standard_format(ldt) << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
@@ -218,7 +218,7 @@ std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_a
 
         // Decrypt file content
         decrypted_content = Encryptor::decrypt_all(encrypted_file_content, password);
-        last_decryption_timestamp = Utilities::get_current_date_and_time_as_raw_string();
+        last_decryption_timestamp = DateTimeUtilities::get_current_date_and_time_as_raw_string();
 
         // Add timestamp to the vector and save it to the file
         auto vector_with_timestamp = add_timestamp_to_vector(encrypted_file_content);
@@ -275,7 +275,7 @@ void PasswordManager::init() noexcept {
 
         // Decryption of the file
         auto pair = get_password_and_try_decrypt();
-        last_decryption_timestamp = Utilities::get_current_date_and_time_as_raw_string();
+        last_decryption_timestamp = DateTimeUtilities::get_current_date_and_time_as_raw_string();
 
         if(pair.second.empty()) {
             system("cls");
