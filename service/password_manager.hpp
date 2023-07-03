@@ -42,7 +42,7 @@ class PasswordManager {
      * @brief Gets criteria (for sorting, filtering etc.) and some additional information from user
      * @return std::vector<std::pair<password_field, std::string>> containing criteria and some additional information
      */
-    static std::vector<std::pair<password_field, std::string>> get_criteria_plus_from_user() noexcept;
+    static std::vector<std::pair<password_field, std::string>> get_extended_criteria_from_user() noexcept;
 
     /**
      * @brief Refreshes the set of categories
@@ -131,18 +131,18 @@ public:
     /**
      * @brief Adds a new password
      */
-    void add_password_menu() noexcept;
+    void add_password() noexcept;
 
     /**
      * @brief Allows the user to edit the selected password
      */
-    void edit_password_menu() noexcept;
+    void edit_password() noexcept;
 
     /**
      * @brief Removes passwords chosen by the user
      * @details Shows all passwords and asks the user which passwords should be removed
      */
-    void remove_passwords_menu();
+    void remove_passwords();
 
     /**
      * @brief Removes passwords at given indexes
@@ -153,12 +153,12 @@ public:
     /**
      * @brief Adds a new category
      */
-    void add_category_menu() noexcept;
+    void add_category() noexcept;
 
     /**
      * @brief Removes a category and all passwords that belong to it
      */
-    void remove_category_menu() noexcept;
+    void remove_category() noexcept;
 
     /**
      * @brief Shows a menu for the user

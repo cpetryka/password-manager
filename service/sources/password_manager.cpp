@@ -26,7 +26,7 @@ std::vector<password_field> PasswordManager::get_criteria_from_user() noexcept {
     return criteria;
 }
 
-std::vector<std::pair<password_field, std::string>> PasswordManager::get_criteria_plus_from_user() noexcept {
+std::vector<std::pair<password_field, std::string>> PasswordManager::get_extended_criteria_from_user() noexcept {
     std::vector<std::pair<password_field, std::string>> criteria;
 
     while(true) {
@@ -356,7 +356,7 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
 }
 
 std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept {
-    auto criteria = get_criteria_plus_from_user();
+    auto criteria = get_extended_criteria_from_user();
 
     auto result = std::vector<std::unique_ptr<Password>> {};
 
@@ -393,7 +393,7 @@ void PasswordManager::sort_passwords(const std::vector<password_field> &criteria
     });
 }
 
-void PasswordManager::add_password_menu() noexcept {
+void PasswordManager::add_password() noexcept {
     std::cout << "========== ADDING NEW PASSWORD ==========" << std::endl;
 
     std::cout << "Provide description: ";
@@ -474,7 +474,7 @@ void PasswordManager::add_password_menu() noexcept {
     passwords.emplace_back(std::make_unique<Password>(description, password, category, website_address, login));
 }
 
-void PasswordManager::edit_password_menu() noexcept {
+void PasswordManager::edit_password() noexcept {
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
@@ -509,7 +509,7 @@ void PasswordManager::edit_password_menu() noexcept {
     } while (!passwords[user_choice - 1]->edit_password(field, new_value));
 }
 
-void PasswordManager::remove_passwords_menu() {
+void PasswordManager::remove_passwords() {
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
@@ -561,7 +561,7 @@ void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
     }
 }
 
-void PasswordManager::add_category_menu() noexcept {
+void PasswordManager::add_category() noexcept {
     std::cout << "========== ADDING CATEGORY ==========" << std::endl;
     std::cout << "Provide category name: ";
     auto category_name = std::string();
@@ -576,7 +576,7 @@ void PasswordManager::add_category_menu() noexcept {
     std::cout << "Category added successfully!" << std::endl;
 }
 
-void PasswordManager::remove_category_menu() noexcept {
+void PasswordManager::remove_category() noexcept {
     std::cout << "========== REMOVING CATEGORY ==========" << std::endl;
     std::cout << "Provide category name: ";
     auto category_name = std::string();
@@ -654,16 +654,16 @@ void PasswordManager::menu() noexcept {
                 std::cout << "The passwords have been sorted successfully!" << std::endl;
                 break;
             case 4:
-                add_password_menu();
+                add_password();
                 break;
             case 5:
-                edit_password_menu();
+                edit_password();
                 break;
             case 6:
-                remove_passwords_menu();
+                remove_passwords();
                 break;
             case 7:
-                add_category_menu();
+                add_category();
 
                 system("cls");
                 std::cout << "The categories are now: " << get_categories_string() << std::endl;
@@ -672,7 +672,7 @@ void PasswordManager::menu() noexcept {
 
                 break;
             case 8:
-                remove_category_menu();
+                remove_category();
                 break;
             case 9:
                 FileWriter::save(
