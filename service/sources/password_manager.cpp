@@ -472,6 +472,8 @@ void PasswordManager::add_password() noexcept {
     std::getline(std::cin, login);
 
     passwords.emplace_back(std::make_unique<Password>(description, password, category, website_address, login));
+
+    std::cout << "Password has been added successfully!" << std::endl;
 }
 
 void PasswordManager::edit_password() noexcept {
@@ -665,11 +667,7 @@ void PasswordManager::menu() noexcept {
             case 7:
                 add_category();
 
-                system("cls");
                 std::cout << "The categories are now: " << get_categories_string() << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                system("cls");
-
                 break;
             case 8:
                 remove_category();
