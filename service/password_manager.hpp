@@ -32,6 +32,7 @@ class PasswordManager {
     const fs::path SAVED_PASSWORDS_PATH = fs::path {"saved_passwords"};
     const std::string SEPARATOR = ";";
 
+    // --------------------------------- CRITERIA CHOICE ---------------------------------
     /**
      * @brief Gets criteria (for sorting, filtering etc.) from user
      * @return std::vector<password_field> containing criteria
@@ -44,11 +45,7 @@ class PasswordManager {
      */
     static std::vector<std::pair<password_field, std::string>> get_extended_criteria_from_user() noexcept;
 
-    /**
-     * @brief Refreshes the set of categories
-     */
-    void refresh_categories_set() noexcept;
-
+    // --------------------------------- CATEGORIES MANAGEMENT ---------------------------------
     /**
      * @brief Checks if the category exists
      * @param category
@@ -63,6 +60,12 @@ class PasswordManager {
     std::string get_categories_string() const noexcept;
 
     /**
+     * @brief Refreshes the set of categories
+     */
+    void refresh_categories_set() noexcept;
+
+    // --------------------------------- HELPER METHODS ---------------------------------
+    /**
      * @brief Checks if the password has already been used
      * @param std::filesystem::path path to the file with passwords
      * @param std::string containing the password
@@ -71,30 +74,39 @@ class PasswordManager {
     bool check_if_password_has_already_been_used(const std::string& password) const noexcept;
 
     /**
+     * @brief Removes passwords at given indexes
+     * @param indexes vector of indexes of passwords to be removed
+     */
+    void remove_passwords_at_indexes(std::vector<int>& indexes);
+
+    // --------------------------------- VECTOR ENCRYPTION ---------------------------------
+    /**
      * @brief Generates a vector of strings that will be saved to the file
      */
     std::vector<std::string> generate_encrypted_output_vector() const noexcept;
 
+    // --------------------------------- TIMESTAMP MANAGEMENT ---------------------------------
     /**
      * @brief Adds timestamp to the given vector
      * @param std::vector<std::string> containing elements
      * @return std::vector<std::string> containing elements with timestamp
      * @details The timestamp is at the beginning of the second, fourth, sixth and eight element
      */
-    std::vector<std::string> add_timestamp_to_vector(const std::vector<std::string>& vector) const noexcept;
+    static std::vector<std::string> add_timestamp_to_vector(const std::vector<std::string>& vector, const std::string& last_decryption) noexcept;
 
     /**
      * @brief Gets and removes timestamp from the given vector
      * @param std::vector<std::string> containing elements with timestamp
      * @return std::string containing timestamp
      */
-    std::string get_and_remove_timestamp_from_vector(std::vector<std::string>& vector) noexcept;
+    static std::string get_and_remove_timestamp_from_vector(std::vector<std::string>& vector) noexcept;
 
+    // --------------------------------- CLASS INITIALIZATION ---------------------------------
     /**
      * @brief This method allows user to choose whether to use one of the saved files or to provide their own path
      * @return std::filesystem::path representing a path to a chosen file
      */
-    fs::path get_path_to_file_with_passwords_from_user();
+    fs::path get_path_to_file_with_passwords_from_user() const;
 
     /**
      * @brief This method allows user to enter a password and tries to decrypt the file using this password
@@ -107,12 +119,6 @@ class PasswordManager {
      * @brief Initializes the PasswordManager object
      */
     void init() noexcept;
-
-    /**
-     * @brief Removes passwords at given indexes
-     * @param indexes vector of indexes of passwords to be removed
-     */
-    void remove_passwords_at_indexes(std::vector<int>& indexes);
 public:
     explicit PasswordManager() noexcept;
 

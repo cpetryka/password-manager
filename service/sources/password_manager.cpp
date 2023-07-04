@@ -12,11 +12,14 @@ std::vector<password_field> PasswordManager::get_criteria_from_user() noexcept {
         std::cout << "========== CRITERIA CHOOSER ==========" << std::endl;
         auto choice = PasswordField::choose_field_menu();
 
-        criteria.push_back(choice);
+        criteria.emplace_back(choice);
 
-        std::cout << "Do you want to add another criteria? (y/n): ";
         auto answer = std::string {};
-        std::getline(std::cin, answer);
+
+        do {
+            std::cout << "Do you want to add another criteria? (y/n): ";
+            std::getline(std::cin, answer);
+        } while(answer != "y" && answer != "n");
 
         if(answer == "n") {
             break;
@@ -40,9 +43,12 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_extende
 
         criteria.emplace_back(choice, additional_info);
 
-        std::cout << "Do you want to add another criteria? (y/n): ";
         auto answer = std::string {};
-        std::getline(std::cin, answer);
+
+        do {
+            std::cout << "Do you want to add another criteria? (y/n): ";
+            std::getline(std::cin, answer);
+        } while(answer != "y" && answer != "n");
 
         if(answer == "n") {
             break;
@@ -50,15 +56,6 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_extende
     }
 
     return criteria;
-}
-
-void PasswordManager::refresh_categories_set() noexcept {
-    // clear the set because there might be some old categories that are no longer in use
-    categories.clear();
-
-    for (const auto& password_ptr : passwords) {
-        categories.emplace(Utilities::to_lowercase(password_ptr->get_field(password_field::CATEGORY)));
-    }
 }
 
 bool PasswordManager::do_category_exists(const std::string &category) const noexcept {
@@ -78,10 +75,29 @@ std::string PasswordManager::get_categories_string() const noexcept {
     return result + "]";
 }
 
+void PasswordManager::refresh_categories_set() noexcept {
+    // Clear the set because there might be some old categories that are no longer in use
+    categories.clear();
+
+    for (const auto& password_ptr : passwords) {
+        categories.emplace(Utilities::to_lowercase(password_ptr->get_field(password_field::CATEGORY)));
+    }
+}
+
 bool PasswordManager::check_if_password_has_already_been_used(const std::string& password) const noexcept {
     return std::ranges::any_of(passwords, [&password](const auto& password_ptr) {
         return password_ptr->compare_field_with(password_field::PASSWORD, password);
     });
+}
+
+void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
+    std::ranges::sort(indexes);
+
+    // We need to remove the passwords from the end, because if we remove them from the beginning, the indexes
+    // of the remaining passwords will change
+    for(auto it = indexes.rbegin(); it != indexes.rend(); ++it) {
+        passwords.erase(passwords.begin() + *it);
+    }
 }
 
 std::vector<std::string> PasswordManager::generate_encrypted_output_vector() const noexcept {
@@ -94,9 +110,9 @@ std::vector<std::string> PasswordManager::generate_encrypted_output_vector() con
     return result;
 }
 
-std::vector<std::string> PasswordManager::add_timestamp_to_vector(const std::vector<std::string>& vector) const noexcept {
+std::vector<std::string> PasswordManager::add_timestamp_to_vector(const std::vector<std::string>& vector, const std::string& last_decryption) noexcept {
     auto result = std::vector<std::string> {vector};
-    auto timestamp_copy = last_decryption_timestamp;
+    auto timestamp_copy = last_decryption;
 
     // If there is fewer than 8 elements in the vector, then we need to add empty strings to the vector
     while(result.size() < 8) {
@@ -106,7 +122,6 @@ std::vector<std::string> PasswordManager::add_timestamp_to_vector(const std::vec
     // Add the timestamp to the vector
     for(auto i = 1; i < 8; i += 2) {
         result.at(i) = timestamp_copy.substr(0, 4) + result.at(i);
-        // result.emplace(result.begin() + i, timestamp_copy.substr(0, 4) + result.at(i));
         timestamp_copy = timestamp_copy.substr(4);
     }
 
@@ -129,7 +144,7 @@ std::string PasswordManager::get_and_remove_timestamp_from_vector(std::vector<st
     return timestamp_temp;
 }
 
-fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
+fs::path PasswordManager::get_path_to_file_with_passwords_from_user() const {
     auto path = fs::path {};
     auto do_continue {true};
     auto choice {0};
@@ -161,8 +176,6 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
 
                         if (FileManager::check_if_file_exists(path)) {
                             std::cout << "File with this name already exists. Try again!" << std::endl;
-                            std::this_thread::sleep_for(std::chrono::seconds(1));
-                            system("cls");
                             continue;
                         }
 
@@ -186,7 +199,7 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() {
             default:
                 system("cls");
                 std::cout << "There's no such option. Try again!" << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(2));
                 system("cls");
         }
     }
@@ -221,7 +234,7 @@ std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_a
         last_decryption_timestamp = DateTimeUtilities::get_current_date_and_time_as_raw_string();
 
         // Add timestamp to the vector and save it to the file
-        auto vector_with_timestamp = add_timestamp_to_vector(encrypted_file_content);
+        auto vector_with_timestamp = add_timestamp_to_vector(encrypted_file_content, last_decryption_timestamp);
 
         FileWriter::save(
                 path_to_file_with_passwords,
@@ -268,22 +281,21 @@ void PasswordManager::init() noexcept {
         if(this->path_to_file_with_passwords.empty()) {
             system("cls");
             std::cout << "Something went wrong. Try again!" << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(2));
             continue;
         }
 
         // Decryption of the file
         auto pair = get_password_and_try_decrypt();
-        last_decryption_timestamp = DateTimeUtilities::get_current_date_and_time_as_raw_string();
 
         if(pair.second.empty()) {
             system("cls");
             std::cout << "Something went wrong. Try again!" << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(2));
             continue;
         }
 
-        // If the decryption was successful, then we can assign the master password and the passwords vector and break the loop
+        // If the decryption was successful, then we can assign master password and the passwords vector and break the loop
         this->master_password = pair.first;
 
         auto to_erase = std::ranges::remove_if(pair.second.begin(), pair.second.end(), [](const auto& line) {
@@ -298,16 +310,6 @@ void PasswordManager::init() noexcept {
         }
 
         break;
-    }
-}
-
-void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
-    std::ranges::sort(indexes);
-
-    // We need to remove the passwords from the end, because if we remove them from the beginning, the indexes
-    // of the remaining passwords will change
-    for(auto it = indexes.rbegin(); it != indexes.rend(); ++it) {
-        passwords.erase(passwords.begin() + *it);
     }
 }
 
@@ -735,7 +737,7 @@ void PasswordManager::menu() noexcept {
             case 9:
                 FileWriter::save(
                         path_to_file_with_passwords,
-                        add_timestamp_to_vector(generate_encrypted_output_vector())
+                        add_timestamp_to_vector(generate_encrypted_output_vector(), last_decryption_timestamp)
                 );
 
                 std::cout << "Changes saved successfully!" << std::endl;
