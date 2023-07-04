@@ -255,7 +255,6 @@ std::pair<std::string, std::vector<std::string>> PasswordManager::get_password_a
     return std::make_pair(password, decrypted_content);
 }
 
-
 void PasswordManager::init() noexcept {
     auto separator = SEPARATOR;
 
@@ -299,6 +298,16 @@ void PasswordManager::init() noexcept {
         }
 
         break;
+    }
+}
+
+void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
+    std::ranges::sort(indexes);
+
+    // We need to remove the passwords from the end, because if we remove them from the beginning, the indexes
+    // of the remaining passwords will change
+    for(auto it = indexes.rbegin(); it != indexes.rend(); ++it) {
+        passwords.erase(passwords.begin() + *it);
     }
 }
 
@@ -355,9 +364,7 @@ PasswordManager &PasswordManager::operator=(PasswordManager &&pm) noexcept {
     return *this;
 }
 
-std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept {
-    auto criteria = get_extended_criteria_from_user();
-
+std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords(const std::vector<std::pair<password_field, std::string>>& criteria) noexcept {
     auto result = std::vector<std::unique_ptr<Password>> {};
 
     for(const auto& password : passwords) {
@@ -398,13 +405,18 @@ bool PasswordManager::sort_passwords(const std::vector<password_field> &criteria
 bool PasswordManager::add_password() noexcept {
     std::cout << "========== ADDING NEW PASSWORD ==========" << std::endl;
 
+    // Description of the password
     std::cout << "Provide description: ";
     auto description = std::string {};
     std::getline(std::cin, description);
 
-    std::cout << "Do you want to provide your own password (enter 1) or generate one (enter 2): ";
+    // Password of the password
     auto user_choice {-1};
-    std::cin >> user_choice; std::cin.get();
+
+    do {
+        std::cout << "Do you want to provide your own password (enter 1) or generate one (enter 2): ";
+        std::cin >> user_choice; std::cin.get();
+    } while(user_choice != 1 && user_choice != 2);
 
     auto password = std::string {};
 
@@ -422,9 +434,12 @@ bool PasswordManager::add_password() noexcept {
                 std::cout << "WARNING! This password has already been used!" << std::endl;
             }
 
-            std::cout << "Do you want to provide another password? (y/n): ";
             auto answer = std::string {};
-            std::getline(std::cin, answer);
+
+            do {
+                std::cout << "Do you want to provide another password? (y/n): ";
+                std::getline(std::cin, answer);
+            } while(answer != "y" && answer != "n");
 
             if(answer == "n") {
                 do_continue = false;
@@ -432,22 +447,26 @@ bool PasswordManager::add_password() noexcept {
         }
     }
     else if(user_choice == 2) {
-        std::cout << "How many characters should the password have? (min 8): ";
         auto number_of_characters {-1};
-        std::cin >> number_of_characters; std::cin.get();
 
-        if(number_of_characters < 8) {
-            std::cout << "The number of characters cannot be less than 8! Exiting..." << std::endl;
-            return false;
-        }
+        do {
+            std::cout << "How many characters should the password have? (min 8): ";
+            std::cin >> number_of_characters; std::cin.get();
+        } while(number_of_characters < 8);
 
-        std::cout << "Should the password contain upper and lower case letters? (y/n): ";
         auto answer = std::string {};
-        std::getline(std::cin, answer);
 
-        std::cout << "Should the password contain special characters? (y/n): ";
+        do {
+            std::cout << "Should the password contain upper and lower case letters? (y/n): ";
+            std::getline(std::cin, answer);
+        } while(answer != "y" && answer != "n");
+
         auto answer2 = std::string {};
-        std::getline(std::cin, answer2);
+
+        do {
+            std::cout << "Should the password contain special characters? (y/n): ";
+            std::getline(std::cin, answer2);
+        } while(answer2 != "y" && answer2 != "n");
 
         password = Password::generate_password(number_of_characters, answer == "y", answer2 == "y");
     }
@@ -456,19 +475,25 @@ bool PasswordManager::add_password() noexcept {
         return false;
     }
 
+    // Category of the password
     std::cout << "Available categories: " << get_categories_string() << std::endl;
+
     auto category = std::string {};
+
     do {
         std::cout << "Provide category: " << std::endl;
         std::getline(std::cin, category);
     } while(!do_category_exists(category));
 
+    // Website address of the password
     auto website_address = std::string {};
+
     do {
         std::cout << "Provide website address (enter '-' if you do not want to provide a login): ";
         std::getline(std::cin, website_address);
     } while(!PasswordValidator::is_website_address_valid(website_address));
 
+    // Login of the password
     std::cout << "Provide login (enter '-' if you do not want to provide a login): ";
     auto login = std::string {};
     std::getline(std::cin, login);
@@ -478,22 +503,31 @@ bool PasswordManager::add_password() noexcept {
 }
 
 bool PasswordManager::edit_password() noexcept {
+    // Print all passwords
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
     }
 
-    std::cout << "Which password do you want to edit? Enter number (0 to cancel): ";
+    // Choose password to edit
     auto user_choice {-1};
-    std::cin >> user_choice; std::cin.get();
 
-    if(user_choice < 1 || user_choice > passwords.size()) {
+    do {
+        std::cout << "Which password do you want to edit? Enter number (0 to cancel): ";
+        std::cin >> user_choice; std::cin.get();
+    } while(user_choice < 0 || user_choice > passwords.size());
+
+    if(user_choice == 0) {
+        std::cout << "Cancelling..." << std::endl;
         return false;
     }
+
+    // Let user choose field to edit
     std::cout << "========== EDITING PASSWORD ==========" << std::endl;
-    std::cout << "What do you want to edit?" << std::endl;
+    std::cout << "Which field do you want to edit?" << std::endl;
     auto field = PasswordField::choose_field_menu();
 
+    // Edit field (user can try to edit field 3 times)
     auto new_value = std::string();
     auto i = 0;
 
@@ -515,91 +549,104 @@ bool PasswordManager::edit_password() noexcept {
 }
 
 bool PasswordManager::remove_passwords() {
+    // Print all passwords
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
     }
 
-    std::cout << "Which passwords do you want to remove? Enter numbers separated by spaces (0 to cancel): ";
+    // Ask the user which passwords they want to remove
     auto user_choice = std::string();
-    std::getline(std::cin, user_choice);
+
+    do {
+        std::cout << "Which passwords do you want to remove? Enter numbers separated by spaces (0 to cancel): ";
+        std::getline(std::cin, user_choice);
+    } while(!std::regex_match(user_choice, std::regex("\\d+( \\d+)*")));
 
     if(user_choice == "0") {
         return false;
     }
 
-    std::cout << "Are you sure you want to remove selected passwords? (y/n): ";
+    // Ask the user if they are sure they want to remove the passwords
     auto do_remove = std::string();
-    std::getline(std::cin, do_remove);
+
+    do {
+        std::cout << "Are you sure you want to remove selected passwords? (y/n): ";
+        std::getline(std::cin, do_remove);
+    } while(do_remove != "y" && do_remove != "n");
 
     if(do_remove == "n") {
         return false;
     }
 
+    // Convert the user's choice to a vector of numbers
     auto passwords_to_remove = Utilities::split_to_numbers(user_choice, " ");
 
-    // We need to subtract 1 from each number, because the user sees the passwords from 1 to n, but the vector
-    // is indexed from 0 to n - 1
+    // We need to subtract 1 from each number
     std::ranges::transform(passwords_to_remove, passwords_to_remove.begin(), [](const auto& number) {
         return number - 1;
     });
 
+    // Remove all numbers that are out of range
     auto to_erase = std::ranges::remove_if(passwords_to_remove, [this](const auto& number) {
         return number < 0 || number >= passwords.size();
     });
     passwords_to_remove.erase(to_erase.begin(), to_erase.end());
 
-    std::ranges::sort(passwords_to_remove);
-
+    // Remove the passwords
     remove_passwords_at_indexes(passwords_to_remove);
 
     return true;
 }
 
-void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
-    std::ranges::sort(indexes);
-
-    // We need to remove the passwords from the end, because if we remove them from the beginning, the indexes
-    // of the remaining passwords will change
-    for(auto it = indexes.rbegin(); it != indexes.rend(); ++it) {
-        passwords.erase(passwords.begin() + *it);
-    }
-}
-
 bool PasswordManager::add_category() noexcept {
+    // Ask the user for the category name to add
     std::cout << "========== ADDING CATEGORY ==========" << std::endl;
-    std::cout << "Provide category name: ";
+    std::cout << "Provide category name to add: ";
     auto category_name = std::string();
     std::getline(std::cin, category_name);
 
+    // Check if the category already exists
     if(do_category_exists(category_name)) {
         std::cout << "Category with this name already exists!" << std::endl;
         return false;
     }
 
+    // Add the category to the set
     categories.emplace(Utilities::to_lowercase(category_name));
+
     return true;
 }
 
 bool PasswordManager::remove_category() noexcept {
+    // It's not possible to remove a category if there are no categories
+    if(categories.empty()) {
+        std::cout << "There are no categories to remove!" << std::endl;
+        return false;
+    }
+
+    // Print all categories and ask the user which one to remove
     std::cout << "========== REMOVING CATEGORY ==========" << std::endl;
-    std::cout << "Provide category name: ";
+    std::cout << "Available categories: " << get_categories_string() << std::endl;
+    std::cout << "Provide category name to remove: ";
     auto category_name = std::string();
     std::getline(std::cin, category_name);
 
+    // Check if the category exists
     if(!do_category_exists(category_name)) {
         std::cout << "Category with this name does not exist!" << std::endl;
         return false;
     }
 
+    // Remove category from the set
     categories.erase(Utilities::to_lowercase(category_name));
 
-    // Remove all passwords that were in this category
+    // Remove all passwords that have this category
     auto to_erase = std::ranges::remove_if(passwords, [&category_name](const auto& password) {
-        return password->get_field(password_field::CATEGORY) == category_name;
+        return password->compare_field_with(password_field::CATEGORY, category_name);
     });
-
     passwords.erase(to_erase.begin(), to_erase.end());
+
     return true;
 }
 
@@ -624,7 +671,6 @@ void PasswordManager::menu() noexcept {
         system("cls");
         switch(choice) {
             case 1:
-                system("cls");
                 std::cout << "========== PASSWORDS ==========" << std::endl;
 
                 if(passwords.empty()) {
@@ -639,13 +685,13 @@ void PasswordManager::menu() noexcept {
                 break;
             case 2:
                 {
-                    auto criteria_passwords = get_passwords();
+                    auto criteria_passwords = get_passwords(get_extended_criteria_from_user());
 
                     system("cls");
                     std::cout << "========== PASSWORDS ==========" << std::endl;
 
                     if(criteria_passwords.empty()) {
-                        std::cout << "No passwords match the given criteria!" << std::endl;
+                        std::cout << "No passwords to show!" << std::endl;
                         break;
                     }
 

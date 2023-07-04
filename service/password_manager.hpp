@@ -107,6 +107,12 @@ class PasswordManager {
      * @brief Initializes the PasswordManager object
      */
     void init() noexcept;
+
+    /**
+     * @brief Removes passwords at given indexes
+     * @param indexes vector of indexes of passwords to be removed
+     */
+    void remove_passwords_at_indexes(std::vector<int>& indexes);
 public:
     explicit PasswordManager() noexcept;
 
@@ -118,9 +124,10 @@ public:
 
     /**
      * @brief Returns passwords that match the given criteria
+     * @param std::vector<std::pair<password_field, std::string>> containing criteria
      * @return std::vector<std::unique_ptr<Password>> containing passwords that match the given criteria
      */
-    std::vector<std::unique_ptr<Password>> get_passwords() noexcept;
+    std::vector<std::unique_ptr<Password>> get_passwords(const std::vector<std::pair<password_field, std::string>>& criteria) noexcept;
 
     /**
      * @brief Sorts passwords by given criteria
@@ -143,12 +150,6 @@ public:
      * @details Shows all passwords and asks the user which passwords should be removed
      */
     bool remove_passwords();
-
-    /**
-     * @brief Removes passwords at given indexes
-     * @param indexes vector of indexes of passwords to be removed
-     */
-    void remove_passwords_at_indexes(std::vector<int>& indexes);
 
     /**
      * @brief Adds a new category
