@@ -378,7 +378,7 @@ std::vector<std::unique_ptr<Password>> PasswordManager::get_passwords() noexcept
     return result;
 }
 
-void PasswordManager::sort_passwords(const std::vector<password_field> &criteria) noexcept {
+bool PasswordManager::sort_passwords(const std::vector<password_field> &criteria) noexcept {
     std::ranges::sort(passwords, [&criteria](const auto& lhs, const auto& rhs) {
         for(const auto& one_criteria : criteria) {
             const auto lhs_field_value = lhs->get_field(one_criteria);
@@ -391,9 +391,11 @@ void PasswordManager::sort_passwords(const std::vector<password_field> &criteria
 
         return false;
     });
+
+    return true;
 }
 
-void PasswordManager::add_password() noexcept {
+bool PasswordManager::add_password() noexcept {
     std::cout << "========== ADDING NEW PASSWORD ==========" << std::endl;
 
     std::cout << "Provide description: ";
@@ -436,7 +438,7 @@ void PasswordManager::add_password() noexcept {
 
         if(number_of_characters < 8) {
             std::cout << "The number of characters cannot be less than 8! Exiting..." << std::endl;
-            return;
+            return false;
         }
 
         std::cout << "Should the password contain upper and lower case letters? (y/n): ";
@@ -451,7 +453,7 @@ void PasswordManager::add_password() noexcept {
     }
     else {
         std::cout << "There is no such option! Exiting..." << std::endl;
-        return;
+        return false;
     }
 
     std::cout << "Available categories: " << get_categories_string() << std::endl;
@@ -472,11 +474,10 @@ void PasswordManager::add_password() noexcept {
     std::getline(std::cin, login);
 
     passwords.emplace_back(std::make_unique<Password>(description, password, category, website_address, login));
-
-    std::cout << "Password has been added successfully!" << std::endl;
+    return true;
 }
 
-void PasswordManager::edit_password() noexcept {
+bool PasswordManager::edit_password() noexcept {
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
@@ -487,7 +488,7 @@ void PasswordManager::edit_password() noexcept {
     std::cin >> user_choice; std::cin.get();
 
     if(user_choice < 1 || user_choice > passwords.size()) {
-        return;
+        return false;
     }
     std::cout << "========== EDITING PASSWORD ==========" << std::endl;
     std::cout << "What do you want to edit?" << std::endl;
@@ -499,7 +500,7 @@ void PasswordManager::edit_password() noexcept {
     do {
         if(i == 3) {
             std::cout << "You have entered invalid value 3 times. Cancelling..." << std::endl;
-            return;
+            return false;
         }
 
         if(i++ > 0) {
@@ -509,9 +510,11 @@ void PasswordManager::edit_password() noexcept {
         std::cout << "Provide new value: ";
         std::getline(std::cin, new_value);
     } while (!passwords[user_choice - 1]->edit_password(field, new_value));
+
+    return true;
 }
 
-void PasswordManager::remove_passwords() {
+bool PasswordManager::remove_passwords() {
     std::cout << "========== PASSWORDS ==========" << std::endl;
     for (int i = 0; i < passwords.size(); ++i) {
         std::cout << (i + 1) << ". " << *passwords[i] << std::endl;
@@ -522,7 +525,7 @@ void PasswordManager::remove_passwords() {
     std::getline(std::cin, user_choice);
 
     if(user_choice == "0") {
-        return;
+        return false;
     }
 
     std::cout << "Are you sure you want to remove selected passwords? (y/n): ";
@@ -530,7 +533,7 @@ void PasswordManager::remove_passwords() {
     std::getline(std::cin, do_remove);
 
     if(do_remove == "n") {
-        return;
+        return false;
     }
 
     auto passwords_to_remove = Utilities::split_to_numbers(user_choice, " ");
@@ -550,7 +553,7 @@ void PasswordManager::remove_passwords() {
 
     remove_passwords_at_indexes(passwords_to_remove);
 
-    std::cout << "Passwords removed successfully!" << std::endl;
+    return true;
 }
 
 void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
@@ -563,7 +566,7 @@ void PasswordManager::remove_passwords_at_indexes(std::vector<int> &indexes) {
     }
 }
 
-void PasswordManager::add_category() noexcept {
+bool PasswordManager::add_category() noexcept {
     std::cout << "========== ADDING CATEGORY ==========" << std::endl;
     std::cout << "Provide category name: ";
     auto category_name = std::string();
@@ -571,14 +574,14 @@ void PasswordManager::add_category() noexcept {
 
     if(do_category_exists(category_name)) {
         std::cout << "Category with this name already exists!" << std::endl;
-        return;
+        return false;
     }
 
     categories.emplace(Utilities::to_lowercase(category_name));
-    std::cout << "Category added successfully!" << std::endl;
+    return true;
 }
 
-void PasswordManager::remove_category() noexcept {
+bool PasswordManager::remove_category() noexcept {
     std::cout << "========== REMOVING CATEGORY ==========" << std::endl;
     std::cout << "Provide category name: ";
     auto category_name = std::string();
@@ -586,11 +589,10 @@ void PasswordManager::remove_category() noexcept {
 
     if(!do_category_exists(category_name)) {
         std::cout << "Category with this name does not exist!" << std::endl;
-        return;
+        return false;
     }
 
     categories.erase(Utilities::to_lowercase(category_name));
-    std::cout << "Category removed successfully!" << std::endl;
 
     // Remove all passwords that were in this category
     auto to_erase = std::ranges::remove_if(passwords, [&category_name](const auto& password) {
@@ -598,6 +600,7 @@ void PasswordManager::remove_category() noexcept {
     });
 
     passwords.erase(to_erase.begin(), to_erase.end());
+    return true;
 }
 
 void PasswordManager::menu() noexcept {
@@ -652,25 +655,36 @@ void PasswordManager::menu() noexcept {
                 }
                 break;
             case 3:
-                sort_passwords(PasswordManager::get_criteria_from_user());
-                std::cout << "The passwords have been sorted successfully!" << std::endl;
+                if(sort_passwords(PasswordManager::get_criteria_from_user())) {
+                    std::cout << "The passwords have been sorted successfully!" << std::endl;
+                }
                 break;
             case 4:
-                add_password();
+                if(add_password()) {
+                    std::cout << "Password has been added successfully!" << std::endl;
+                }
                 break;
             case 5:
-                edit_password();
+                if(edit_password()) {
+                    std::cout << "Password has been edited successfully!" << std::endl;
+                }
                 break;
             case 6:
-                remove_passwords();
+                if(remove_passwords()) {
+                    std::cout << "Passwords removed successfully!" << std::endl;
+                }
                 break;
             case 7:
-                add_category();
-
-                std::cout << "The categories are now: " << get_categories_string() << std::endl;
+                if(add_category()) {
+                    std::cout << "Category added successfully!" << std::endl;
+                    std::cout << "The categories are now: " << get_categories_string() << std::endl;
+                }
                 break;
             case 8:
-                remove_category();
+                if(remove_category()) {
+                    std::cout << "Category removed successfully!" << std::endl;
+                    std::cout << "The categories are now: " << get_categories_string() << std::endl;
+                }
                 break;
             case 9:
                 FileWriter::save(

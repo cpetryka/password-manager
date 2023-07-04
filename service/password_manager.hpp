@@ -126,23 +126,23 @@ public:
      * @brief Sorts passwords by given criteria
      * @param criteria vector of criteria
      */
-    void sort_passwords(const std::vector<password_field>& criteria) noexcept;
+    bool sort_passwords(const std::vector<password_field>& criteria) noexcept;
 
     /**
      * @brief Adds a new password
      */
-    void add_password() noexcept;
+    bool add_password() noexcept;
 
     /**
      * @brief Allows the user to edit the selected password
      */
-    void edit_password() noexcept;
+    bool edit_password() noexcept;
 
     /**
      * @brief Removes passwords chosen by the user
      * @details Shows all passwords and asks the user which passwords should be removed
      */
-    void remove_passwords();
+    bool remove_passwords();
 
     /**
      * @brief Removes passwords at given indexes
@@ -153,12 +153,12 @@ public:
     /**
      * @brief Adds a new category
      */
-    void add_category() noexcept;
+    bool add_category() noexcept;
 
     /**
      * @brief Removes a category and all passwords that belong to it
      */
-    void remove_category() noexcept;
+    bool remove_category() noexcept;
 
     /**
      * @brief Shows a menu for the user
