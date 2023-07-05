@@ -8,6 +8,14 @@ bool FileManager::check_if_file_exists(const fs::path& path) {
     return is_regular_file(fs::path(path));
 }
 
+bool FileManager::check_if_directory_exists(const fs::path &path) {
+    return fs::is_directory(fs::path(path));
+}
+
+bool FileManager::check_if_directory_is_empty(const fs::path &path) {
+    return fs::is_empty(path);
+}
+
 std::vector<fs::path> FileManager::get_all_files_from_directory(const fs::path& path) {
     std::vector<fs::path> result;
 

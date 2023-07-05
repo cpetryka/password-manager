@@ -186,6 +186,19 @@ fs::path PasswordManager::get_path_to_file_with_passwords_from_user() const {
                     break;
                 }
             case 2:
+                // Check if the directory exists and create it if it doesn't
+                if(!FileManager::check_if_directory_exists(SAVED_PASSWORDS_PATH)) {
+                    create_directory(SAVED_PASSWORDS_PATH);
+                }
+
+                // Check if the directory is empty, if it is, print a message and go back to the menu
+                if(FileManager::check_if_directory_is_empty(SAVED_PASSWORDS_PATH)) {
+                    std::cout << "There are no saved files. Create one first!" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::seconds(2));
+                    system("cls");
+                    continue;
+                }
+
                 path = FileManager::select_file_from_directory_by_user(SAVED_PASSWORDS_PATH);
                 do_continue = {false};
                 break;

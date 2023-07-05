@@ -22,6 +22,20 @@ struct FileManager {
     static bool check_if_file_exists(const fs::path& path);
 
     /**
+     * @brief Checks if directory exists
+     * @param std::string representing a path to a directory
+     * @return true if directory exists, false otherwise
+     */
+    static bool check_if_directory_exists(const fs::path& path);
+
+    /**
+     * @brief Checks if directory is empty
+     * @param std::string representing a path to a directory
+     * @return true if directory is empty, false otherwise
+     */
+    static bool check_if_directory_is_empty(const fs::path& path);
+
+    /**
      * @brief Gets all files from directory
      * @param std::filesystem::path representing a path to a directory
      * @return std::vector<std::filesystem::path> containing all files from a specified directory
