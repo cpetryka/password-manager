@@ -560,6 +560,11 @@ bool PasswordManager::edit_password() noexcept {
         std::getline(std::cin, new_value);
     } while (!passwords[user_choice - 1]->edit_password(field, new_value));
 
+    // Due to the fact that a new category could have been used, we need to refresh the set of categories
+    if(field == password_field::CATEGORY) {
+        refresh_categories_set();
+    }
+
     return true;
 }
 
