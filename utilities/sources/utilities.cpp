@@ -59,13 +59,3 @@ bool Utilities::get_yes_or_no_from_user(const std::string &message) {
 
     return answer == "y";
 }
-
-std::string Utilities::add_front_zeros(int number, const int full_length) {
-    std::string result = std::to_string(number);
-
-    while(result.size() < full_length) {
-        result = "0" + result;
-    }
-
-    return result;
-}

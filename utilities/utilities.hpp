@@ -58,14 +58,6 @@ struct Utilities {
      * @return true if user answered yes, false otherwise
      */
     static bool get_yes_or_no_from_user(const std::string& message);
-
-    /**
-     * @brief Adds front zeros to number
-     * @param number
-     * @param full_length
-     * @return std::string containing number with front zeros
-     */
-    static std::string add_front_zeros(int number, const int full_length);
 };
 
 

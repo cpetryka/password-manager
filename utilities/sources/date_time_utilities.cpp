@@ -6,19 +6,11 @@
 
 std::string DateTimeUtilities::get_current_date_and_time_as_raw_string() {
     const std::chrono::time_point now{std::chrono::system_clock::now()};
-    const std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
-    const std::chrono::hh_mm_ss hms{std::chrono::floor<std::chrono::seconds>(now - std::chrono::floor<std::chrono::days>(now))};
+    const std::chrono::zoned_time zt{std::chrono::current_zone(), now};
 
-    std::stringstream ss{};
-
-    ss << ymd.year()
-       << Utilities::add_front_zeros(static_cast<unsigned>(ymd.month()), 2)
-       << Utilities::add_front_zeros(static_cast<unsigned>(ymd.day()), 2)
-       << Utilities::add_front_zeros(hms.hours().count() + 2, 2)
-       << Utilities::add_front_zeros(hms.minutes().count() , 2)
-       << Utilities::add_front_zeros(hms.seconds().count() , 2) << "00";
-
-    return ss.str();
+    // We need to get only first 14 characters, because we don't need precise milliseconds
+    // We also need to add "00" at the end as the primitive representation of milliseconds
+    return std::format("{:%Y%m%d%H%M%S}", zt).substr(0, 14) + "00";
 }
 
 std::string DateTimeUtilities::convert_raw_date_string_to_standard_format(const std::string &raw_date_string) {
