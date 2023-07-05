@@ -14,14 +14,8 @@ std::vector<password_field> PasswordManager::get_criteria_from_user() noexcept {
 
         criteria.emplace_back(choice);
 
-        auto answer = std::string {};
-
-        do {
-            std::cout << "Do you want to add another criteria? (y/n): ";
-            std::getline(std::cin, answer);
-        } while(answer != "y" && answer != "n");
-
-        if(answer == "n") {
+        // If the user doesn't want to add another criteria, then we break the loop
+        if(!Utilities::get_yes_or_no_from_user("Do you want to add another criteria?")) {
             break;
         }
     }
@@ -43,14 +37,8 @@ std::vector<std::pair<password_field, std::string>> PasswordManager::get_extende
 
         criteria.emplace_back(choice, additional_info);
 
-        auto answer = std::string {};
-
-        do {
-            std::cout << "Do you want to add another criteria? (y/n): ";
-            std::getline(std::cin, answer);
-        } while(answer != "y" && answer != "n");
-
-        if(answer == "n") {
+        // If the user doesn't want to add another criteria, then we break the loop
+        if(!Utilities::get_yes_or_no_from_user("Do you want to add another criteria?")) {
             break;
         }
     }
@@ -449,14 +437,8 @@ bool PasswordManager::add_password() noexcept {
                 std::cout << "WARNING! This password has already been used!" << std::endl;
             }
 
-            auto answer = std::string {};
-
-            do {
-                std::cout << "Do you want to provide another password? (y/n): ";
-                std::getline(std::cin, answer);
-            } while(answer != "y" && answer != "n");
-
-            if(answer == "n") {
+            // Check if the user wants to provide another password
+            if(!Utilities::get_yes_or_no_from_user("Do you want to provide another password?")) {
                 do_continue = false;
             }
         }
@@ -469,21 +451,13 @@ bool PasswordManager::add_password() noexcept {
             std::cin >> number_of_characters; std::cin.get();
         } while(number_of_characters < 8);
 
-        auto answer = std::string {};
+        auto upper_and_lower_case_letters = Utilities::get_yes_or_no_from_user(
+                "Should the password contain upper and lower case letters?");
 
-        do {
-            std::cout << "Should the password contain upper and lower case letters? (y/n): ";
-            std::getline(std::cin, answer);
-        } while(answer != "y" && answer != "n");
+        auto special_characters = Utilities::get_yes_or_no_from_user(
+                "Should the password contain special characters?");
 
-        auto answer2 = std::string {};
-
-        do {
-            std::cout << "Should the password contain special characters? (y/n): ";
-            std::getline(std::cin, answer2);
-        } while(answer2 != "y" && answer2 != "n");
-
-        password = Password::generate_password(number_of_characters, answer == "y", answer2 == "y");
+        password = Password::generate_password(number_of_characters, upper_and_lower_case_letters, special_characters);
     }
     else {
         std::cout << "There is no such option! Exiting..." << std::endl;
@@ -496,7 +470,7 @@ bool PasswordManager::add_password() noexcept {
     auto category = std::string {};
 
     do {
-        std::cout << "Provide category: " << std::endl;
+        std::cout << "Provide category: ";
         std::getline(std::cin, category);
     } while(!do_category_exists(category));
 
@@ -588,14 +562,7 @@ bool PasswordManager::remove_passwords() {
     }
 
     // Ask the user if they are sure they want to remove the passwords
-    auto do_remove = std::string();
-
-    do {
-        std::cout << "Are you sure you want to remove selected passwords? (y/n): ";
-        std::getline(std::cin, do_remove);
-    } while(do_remove != "y" && do_remove != "n");
-
-    if(do_remove == "n") {
+    if(!Utilities::get_yes_or_no_from_user("Are you sure you want to remove selected passwords?")) {
         return false;
     }
 

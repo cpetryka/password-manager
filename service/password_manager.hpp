@@ -176,5 +176,4 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const PasswordManager& pm) noexcept;
 };
 
-
 #endif //PASSWORD_MANAGER_PASSWORD_MANAGER_HPP

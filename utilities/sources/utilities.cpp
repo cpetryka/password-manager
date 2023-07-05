@@ -50,14 +50,12 @@ bool Utilities::contains_case_insensitive(const std::string &expression, const s
 }
 
 bool Utilities::get_yes_or_no_from_user(const std::string &message) {
-    std::cout << message << " (y/n): ";
-    std::string answer;
-    std::getline(std::cin, answer);
+    auto answer = std::string {};
 
-    while(answer != "y" && answer != "n") {
-        std::cout << "Wrong answer. Try again (y/n): ";
+    do {
+        std::cout << message << " (y/n): ";
         std::getline(std::cin, answer);
-    }
+    } while(answer != "y" && answer != "n");
 
     return answer == "y";
 }
